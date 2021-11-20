@@ -1,4 +1,5 @@
-'''March 27th 2019
+'''
+March 27th 2019
 Script to preprocess raw data.
 The option make_processed_files takes the downloaded files and
 accumulates spikes, angles and state information into a single
@@ -39,7 +40,7 @@ if make_processed_files:
     gff.save_pickle_file(data, save_dir + '%s.p'%session)
 
 if make_rates:
-    print 'Getting kernel rates'
+    print('Getting kernel rates')
     t0 = time.time()
     sigma = 0.1
     params = {'dt' : 0.05, 'method' : 'gaussian', 'sigma' : sigma}
@@ -49,5 +50,5 @@ if make_rates:
         just_wake=True)
     save_dir = gff.return_dir(gen_params['kernel_rates_dir'] + '%0.0fms_sigma/'%(sigma*1000))
     gff.save_pickle_file(rates, save_dir + '%s.p'%session)
-    print 'Time ', time.time() - t0
+    print('Time ', time.time() - t0)
 

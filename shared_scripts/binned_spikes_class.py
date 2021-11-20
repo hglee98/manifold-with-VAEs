@@ -45,7 +45,7 @@ class spike_counts:
         self.anat_region = anat_region
         self.params = params
         # anat_region is either 'all' or a specific area
-        if anat_region is not 'all':
+        if anat_region != 'all':
             area_info = load_pickle_file('../general_params/area_shank_info.p')
             relevant_shanks = area_info[session_id][anat_region]
             relevant_cells = [x for x in self.cell_ids if x[0] in relevant_shanks]

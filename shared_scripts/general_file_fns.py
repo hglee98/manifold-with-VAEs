@@ -17,15 +17,15 @@ def load_file_from_pattern(file_pattern):
     return data, fname
 
 def load_pickle_file(filename):
-    fr = open(filename, 'r')
-    data = pickle.load(fr)
-    fr.close()
+    with open(filename, 'rb') as fr:
+        data = pickle.load(fr)
+        fr.close()
     return data
 
 def save_pickle_file(data, filename):
-    fw = open(filename, 'w')
-    pickle.dump(data, fw)
-    fw.close()
+    with open(filename, 'wb') as fw:
+        pickle.dump(data, fw)
+        fw.close()
     return 1
 
 def return_dir(input_dir):

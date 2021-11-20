@@ -117,7 +117,7 @@ fit_results['tt'], fit_results['curve'] = fhf.get_curve_from_knots(
     fit_results['loop_final_knots'], 'eq_vel')
 
 fit_results['fit_err'] = fitter.saved_knots[0]['err']
-print 'Time ', time.time()-t0
+print('Time ', time.time()-t0)
 
 i0 = 0; i1 = 1; i2 = 2
 fig = plt.figure(figsize=(9,9))

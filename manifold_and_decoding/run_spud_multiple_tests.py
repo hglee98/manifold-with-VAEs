@@ -9,8 +9,8 @@ import numpy.linalg as la
 import sys, os 
 import time, datetime
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-# from sklearn import decomposition, manifold
+#from mpl_toolkits.mplot3d import Axes3D
+from sklearn import decomposition, manifold
 
 sd=int((time.time()%1)*(2**31))
 np.random.seed(sd)
@@ -58,7 +58,7 @@ n_neighbors = 5
 
 run_dim_red_here = True
 if run_dim_red_here:
-    print 'Running initial dimensionality reduction'
+    print('Running initial dimensionality reduction')
     rate_params = {'dt' : dt_kernel, 'sigma' : sigma}
     dim_red_params = {'n_neighbors' : n_neighbors, 'target_dim' : fit_dim}
     desired_nSamples = 15000
@@ -92,7 +92,7 @@ fit_params = {'dalpha' : 0.005, 'knot_order' : knot_order,
 results = {}
 tic = time.time()
 k = (session, fit_dim, nKnots, knot_order, penalty_type, train_frac)
-print 'Fitting manifold'
+print('Fitting manifold')
 for curr_sample in range(nTests):
     curr_fit_params = dict(fit_params)
         
@@ -110,7 +110,7 @@ for curr_sample in range(nTests):
     else:
         results[k] = [[mse, curr_fit_result['fit_err'], 
             np.array(curr_fit_result['final_knots'])]]
-print 'Time ', time.time()-tic
+print('Time ', time.time()-tic)
 
 to_save = {'fit_results' : results, 'session' : session, 'area' : area, 'state' : state, 
     'embed_file' : embed_fname} 

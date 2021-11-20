@@ -38,7 +38,7 @@ class PiecewiseLinearFit:
             kmeans = KMeans(n_clusters=self.nKnots, max_iter=300).fit(self.data_to_fit)
             return kmeans.cluster_centers_
         else:
-            print 'Unknown method'
+            print('Unknown method')
 
     def order_knots(self, knots, method='nearest'):
         '''Order the initial knots so that we can draw a curve through them. 

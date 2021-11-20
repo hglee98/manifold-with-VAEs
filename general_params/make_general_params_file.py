@@ -9,7 +9,7 @@ from general_file_fns import save_pickle_file
 
 param_dict = {}
 # Some commonly used paths
-base_dir = '/Users/rchaudhuri/data/2019_03_hd/'
+base_dir = '/Volumes/Samsung T7/Research copy/Manifold learning with VAE/'
 # Location where Peyrache et al data is unzipped
 param_dict['raw_data_dir'] = base_dir + 'raw_data/'
 
