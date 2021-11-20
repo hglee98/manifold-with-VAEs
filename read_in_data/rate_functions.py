@@ -9,13 +9,14 @@ used (and won't work), but the option is here for historical reasons.
 '''
 
 from __future__ import division
+from angle_fns import circmean
 import numpy as np
-import sys, os
+import sys
+import os
 
 gen_fn_dir = os.path.abspath('../shared_scripts/')
 sys.path.append(gen_fn_dir)
 
-from angle_fns import circmean
 
 def get_rates_and_angles_by_interval(inp_data, params, smooth_type='kernel', just_wake=True):
     '''Extracts rates/spike counts and smoothed angles from the data file
@@ -23,7 +24,7 @@ def get_rates_and_angles_by_interval(inp_data, params, smooth_type='kernel', jus
     with keys: cells, session and states. 
     States is a nested dict. State->intervals->(1)num_spikes, (2)bin_edges, (3)avg_angles
     num_spikes consists of a dict of cell IDs and rates/spike counts in appropriate bins.'''
-    
+
     session = inp_data['session']
     spike_times = inp_data['spike_times']
     cell_IDs = sorted(inp_data['spike_times'].keys())
@@ -59,12 +60,13 @@ def get_rates_and_angles_by_interval(inp_data, params, smooth_type='kernel', jus
                 out_data[state][interval]['angles'] = angles
                 out_data[state][interval]['angle_times'] = angle_times
             elif smooth_type == 'binned':
-                spike_counts, bin_edges, avg_angles = get_rates_angles_binned_dict(inp_data, 
-                    interval[0], interval[1], win_size)
+                spike_counts, bin_edges, avg_angles = get_rates_angles_binned_dict(inp_data,
+                                                                                   interval[0], interval[1], win_size)
                 out_data[state][interval]['num_spikes'] = spike_counts
                 out_data[state][interval]['bin_edges'] = bin_edges
                 out_data[state][interval]['avg_angles'] = avg_angles
     return out_data
+
 
 def get_rates_angles_kernel_dict(inp_data, params, interval):
     '''Convert the set of spike_times into rates using time_bins. Assume that spike_times
@@ -72,7 +74,7 @@ def get_rates_angles_kernel_dict(inp_data, params, interval):
     Params contains sigma, dt.'''
 
     if params['method'] == 'gaussian':
-        wind_fn = lambda mu, x: gaussian_wind_fn(mu, params['sigma'], x)
+        def wind_fn(mu, x): return gaussian_wind_fn(mu, params['sigma'], x)
     else:
         print('Unknown windowing function')
 
@@ -95,21 +97,23 @@ def get_rates_angles_kernel_dict(inp_data, params, interval):
                                    if interval[0] <= x < interval[1]]
         rates[y] = get_kernel_sum(interval_spike_times[y], time_vals, wind_fn)
 
-    angle_idx = np.round(bin_edges * samp_rate).astype(int)    
+    angle_idx = np.round(bin_edges * samp_rate).astype(int)
     # interval_times = zip(bin_edges[:-1], bin_edges[1:])
     # interval_idx = [(np.rint(x[0] * samp_rate).astype(int),
     #                  np.rint(x[1] * samp_rate).astype(int)) for x in interval_times]
 
-    sm_angles = [circmean(angle_list[i0:i1]) for i0,i1 in zip(angle_idx[:-1], 
-        angle_idx[1:])]
+    sm_angles = [circmean(angle_list[i0:i1]) for i0, i1 in zip(angle_idx[:-1],
+                                                               angle_idx[1:])]
 
     # Note change in order that we're returning values
     # used to be "return sm_angles, rates, time_vals, time_vals"
     return time_vals, rates, time_vals, np.array(sm_angles)
 
+
 def gaussian_wind_fn(mu, sigma, x):
     '''Normalized Gaussian'''
     return np.exp(-((x - mu)**2) / (2 * sigma**2)) / (sigma * np.sqrt(2 * np.pi))
+
 
 def get_kernel_sum(spike_list, t_points, win_fun):
     '''Sum a bunch of kernels centered at each spike time. This can be slow, but 

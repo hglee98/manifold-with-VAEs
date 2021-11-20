@@ -2,10 +2,11 @@
 Create a few shared parameters and save them in a file.
 '''
 
-import sys, os
+from general_file_fns import save_pickle_file
+import sys
+import os
 gen_fn_dir = os.path.abspath('..') + '/shared_scripts'
 sys.path.append(gen_fn_dir)
-from general_file_fns import save_pickle_file
 
 param_dict = {}
 # Some commonly used paths
@@ -29,8 +30,8 @@ param_dict['kernel_rates_dir'] = base_dir + 'analyses/2019_03_kernel_rates/'
 param_dict['results_dir'] = base_dir + 'analyses/'
 
 # Colors for the plots.
-param_dict['cols'] = {'REM': (0.392, 0.549, 0.0784), 
-    'SWS': (0.824, 0.627, 0.0392), 'Wake': (0.0118, 0.235, 0.392), 
-    'measured': (0.3, 0.3, 0.3), 'fit': (0.490, 0.961, 0.961)}
+param_dict['cols'] = {'REM': (0.392, 0.549, 0.0784),
+                      'SWS': (0.824, 0.627, 0.0392), 'Wake': (0.0118, 0.235, 0.392),
+                      'measured': (0.3, 0.3, 0.3), 'fit': (0.490, 0.961, 0.961)}
 
 save_pickle_file(param_dict, 'general_params.p')

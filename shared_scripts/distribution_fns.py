@@ -18,6 +18,7 @@ def get_angle_bins(nBins, bin_type='angle'):
     bin_centers = (bin_edges[1:] + bin_edges[:-1]) / 2.
     return bin_edges, bin_centers
 
+
 def get_autocorrelation(x):
     mn = np.mean(x)
     mean_subtracted_x = x - mn
@@ -27,6 +28,7 @@ def get_autocorrelation(x):
     normalized_ac = ac / norm_fac
     return normalized_ac[int(np.floor(normalized_ac.size / 2)):]
 
+
 def get_autocorrelation_no_mean_sub(x):
     # mn = np.mean(x); mean_subtracted_x = x-mn
     ac = np.correlate(x, x, mode='full')
@@ -35,8 +37,10 @@ def get_autocorrelation_no_mean_sub(x):
     normalized_ac = ac / norm_fac
     return normalized_ac[int(np.floor(normalized_ac.size / 2)):]
 
+
 def fixed_ac(x, t=1):
     return np.corrcoef(np.array([x[0:len(x) - t], x[t:len(x)]]))[0, 1]
+
 
 def match_angles_to_shift_and_flip(first_angles, second_angles, shift_dt=0.1):
     '''Shift and flip second_angle to match first_angles as closely as possible'''
@@ -67,8 +71,10 @@ def match_angles_to_shift_and_flip(first_angles, second_angles, shift_dt=0.1):
 
     return final_second
 
+
 def get_centers(inp_arr):
     return (inp_arr[:-1] + inp_arr[1:]) / 2.
+
 
 def get_mean_in_bins(inp_array, bin_edges):
     # inp_array is N x T, and bin_edges is of the form [idx0, idx1, ...,idxN]
@@ -80,4 +86,3 @@ def get_mean_in_bins(inp_array, bin_edges):
         # print i, start_idx, end_idx
         out_array[:, i] = np.mean(inp_array[:, start_idx:end_idx], 1)
     return out_array
-

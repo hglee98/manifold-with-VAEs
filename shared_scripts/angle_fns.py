@@ -7,14 +7,16 @@ from __future__ import division
 import numpy as np
 import numpy.linalg as la
 
+
 def wrap_angles(ang_list, ang_type='angle'):
     ''' Wrap a list of angles to [0,2*np.pi] if type is angle, and to
     [-pi, pi] if type is delta. Don't use this with ang_type='delta' if 
     the data contains NaNs.'''
     x = np.mod(ang_list, 2*np.pi)
-    if ang_type=='delta':
-        x[x>np.pi] = x[x>np.pi] - 2*np.pi
+    if ang_type == 'delta':
+        x[x > np.pi] = x[x > np.pi] - 2*np.pi
     return x
+
 
 def signed_angular_diff(x, y):
     '''Compute the signed angular difference between x and y, and 
@@ -23,32 +25,35 @@ def signed_angular_diff(x, y):
     measured). Statements of the form np.array([2,np.nan])>3 give
     a warning, but statemants like np.nan>3 are fine. To avoid a warning
     looping through rather than vectorizing.'''
-    
+
     # Check for scalar
     if isinstance(x, float):
         diff = np.mod(x-y, 2*np.pi)
-        if diff>np.pi:
+        if diff > np.pi:
             diff = diff - 2*np.pi
     else:
         diff = np.mod(np.array(x)-np.array(y), 2*np.pi)
         # We'd like to say diff[diff>np.pi] = diff[diff>np.pi] - 2*np.pi
         for i in range(len(diff)):
-            if diff[i]>np.pi:
+            if diff[i] > np.pi:
                 diff[i] = diff[i] - 2*np.pi
     return diff
+
 
 def abs_angular_diff(theta_1, theta_2):
     signed_diff = signed_angular_diff(theta_1, theta_2)
     return np.abs(signed_diff)
 
+
 def shifted_angular_diffs(angle_list, bin_sep):
     '''Find the signed angular difference of elements in angle_list separated by bin_sep.'''
     angle_array = np.array(angle_list)
-    
-    if len(angle_array)<=bin_sep:
+
+    if len(angle_array) <= bin_sep:
         return np.array([])
     else:
         return signed_angular_diff(angle_array[bin_sep:], angle_array[:(-bin_sep)])
+
 
 def get_variance_curve(angle_list, t_sep, nan_safe=False):
     '''Gets the variance of changes in angle at each t_sep.
@@ -63,6 +68,7 @@ def get_variance_curve(angle_list, t_sep, nan_safe=False):
 
     return np.array(vr_list)
 
+
 def get_diffusion_curve(angle_list, t_sep, nan_safe=False):
     '''Gets the squared magnitude of changes in angle at each t_sep.
     '''
@@ -74,6 +80,7 @@ def get_diffusion_curve(angle_list, t_sep, nan_safe=False):
         else:
             mag_list.append(np.mean(curr_delta**2))
     return np.array(mag_list)
+
 
 def shift_to_match_given_trace(dec_params, actual_angles, shift_dt=0.1):
     '''Match dec_params to actual angles up to a shift and flip (assuming both are
@@ -90,10 +97,12 @@ def shift_to_match_given_trace(dec_params, actual_angles, shift_dt=0.1):
     # Now look for optimal shift
     for i, sh in enumerate(shifts):
         tmp = np.mod(dec_params + sh, 2 * np.pi)
-        reg_diff[i] = la.norm(abs_angular_diff(actual_angles[no_nan], tmp[no_nan]))
+        reg_diff[i] = la.norm(abs_angular_diff(
+            actual_angles[no_nan], tmp[no_nan]))
 
         tmp2 = np.mod(flip_dec + sh, 2 * np.pi)
-        flip_diff[i] = la.norm(abs_angular_diff(actual_angles[no_nan], tmp2[no_nan]))
+        flip_diff[i] = la.norm(abs_angular_diff(
+            actual_angles[no_nan], tmp2[no_nan]))
 
     min_reg = np.argmin(reg_diff)
     min_flip = np.argmin(flip_diff)
@@ -101,16 +110,20 @@ def shift_to_match_given_trace(dec_params, actual_angles, shift_dt=0.1):
     if reg_diff[min_reg] < flip_diff[min_flip]:
         # print 'Shift = ', shifts[min_reg]
         final_dec = np.mod(dec_params + shifts[min_reg], 2 * np.pi)
-        final_shift = shifts[min_reg]; final_flip = False
+        final_shift = shifts[min_reg]
+        final_flip = False
     else:
         # print 'Shift = ', shifts[min_flip],' and flipped'
         final_dec = np.mod(flip_dec + shifts[min_flip], 2 * np.pi)
-        final_shift = shifts[min_flip]; final_flip = True
+        final_shift = shifts[min_flip]
+        final_flip = True
 
     # Also compute the MSE on non nan angles
-    mse = np.mean(abs_angular_diff(actual_angles[no_nan], final_dec[no_nan])**2)
+    mse = np.mean(abs_angular_diff(
+        actual_angles[no_nan], final_dec[no_nan])**2)
 
     return final_dec, mse, final_shift, final_flip
+
 
 def circmean(x, thresh=0.5, axis=None):
     ''' Computes a circular mean. Has a threshold for nans. If 50% of the angle list is a
