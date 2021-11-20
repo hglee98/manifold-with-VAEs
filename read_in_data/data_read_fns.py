@@ -2,20 +2,18 @@
 Functions to take raw data in the form of .ang, .pos, .clu, and .res files and output
 python-friendly data structures that gather all information together.'''
 
-import os
-import sys
-gen_fn_dir = os.path.abspath('..') + '/shared_scripts'
-sys.path.append(gen_fn_dir)
-
 from __future__ import division
-import general_file_fns as gff
 import numpy as np
+import sys
 import time
 import glob
 import re
+import os
 
+gen_fn_dir = os.path.abspath('..') + '/shared_scripts'
+sys.path.append(gen_fn_dir)
 
-
+import general_file_fns as gff
 
 def match_spikes_to_cells(cluster_file_path, timing_file_path, verbose=True):
     '''
@@ -39,8 +37,7 @@ def match_spikes_to_cells(cluster_file_path, timing_file_path, verbose=True):
     tmp_clusters = gff.read_numerical_file(cluster_file_path, 'int', 'single')
     tmp_spikes = gff.read_numerical_file(timing_file_path, 'float', 'single')
     if verbose:
-        print('Cluster file:', cluster_file_path,
-              'Timing file ', timing_file_path)
+        print ('Cluster file:', cluster_file_path, 'Timing file ', timing_file_path)
 
     # First line in cluster file is number of cells (with 0 corresponding to
     # artifacts and 1 to noise)
@@ -51,7 +48,7 @@ def match_spikes_to_cells(cluster_file_path, timing_file_path, verbose=True):
         nCells = 0
         spike_times = []
         return nCells, spike_times
-    if np.max(cluster_ids) != (nClusters - 1):
+    if np.max(cluster_ids) != (nClusters - 1):  #cluster의 개수가 첫줄에서 얘기하는 것과 다른경우
         print('Clusters listed at beginning of file do not agree')
         nCells = np.nan
         spike_times = []
@@ -69,10 +66,9 @@ def match_spikes_to_cells(cluster_file_path, timing_file_path, verbose=True):
 
     return nCells, spike_times
 
-
 def gather_session_spike_info(params, verbose=True):
     '''Gather data from the downloaded files.
-    For each session we have (a) State information (Wake, REM, SWS), 
+    For each session we have (a) State information (Wake, REM, SWS),
     (b) Position and angle info
     and (c) Spike info.
     '''
@@ -88,11 +84,10 @@ def gather_session_spike_info(params, verbose=True):
     state_names = ['Wake', 'REM', 'SWS']
 
     state_times = {st: gff.read_numerical_file(state_file_base + st, 'float', 'multiple')
-                   for st in state_names}
+        for st in state_names}
 
     # Store head direction in angle_list along with the corresponding times recorded.
-    angle_list_orig = gff.read_numerical_file(
-        file_tag + '.ang', 'float', 'single')
+    angle_list_orig = gff.read_numerical_file(file_tag + '.ang', 'float', 'single')
 
     # When angle couldn't be sampled, these files have -1. But this could mess up
     # averaging if we're careless, so replace it with NaNs.
@@ -106,6 +101,7 @@ def gather_session_spike_info(params, verbose=True):
     # Spike times.
     # There is a .res and .clu file for each shank.
     # .res file contains spike times. .clu contains putative cell identities.
+    # .res file 에는 spike times, .clu는 뉴런의 identities가 나타나있다.
     # Files are of the form session.clu.dd and session.res.dd, where dd is the shank number.
     # The first line in each clu file is the number of clusters for that shank, with clusters
     # 0 and 1 indicating artefacts and noise. So ignore those clusters and start with cluster number
@@ -116,7 +112,9 @@ def gather_session_spike_info(params, verbose=True):
     # so we want to exclude them.
     nShanks = len(
         [fname for fname in glob.glob(curr_data_path + session + '.clu.*') if re.match(
-            file_tag + '.clu.\\d+$', fname)])
+        file_tag + '.clu.\\d+$', fname)])
+    #raw_data 폴더의 .clu.* 정규표현식과 일치하는 파일의 개수를 nShanks에 저장
+    #Shanks
     if verbose:
         print('Number of shanks =', nShanks)
     nCells_per_shank = np.zeros(nShanks)
@@ -147,13 +145,12 @@ def gather_session_spike_info(params, verbose=True):
     # Check for shanks where the number of clusters doesn't equal number of listed cells
     wrong_count_shanks = np.sum(np.isnan(nCells_per_shank))
     if wrong_count_shanks and verbose:
-        print('\nThe number of shanks with wrong number of cells listed is',
-              wrong_count_shanks)
+        print('\nThe number of shanks with wrong number of cells listed is', wrong_count_shanks)
 
     # Gather up stuff and return it
-    data_to_return = {'session': session, 'state_times': state_times, 'angle_list':
-                      np.array(angle_list), 'pos_sampling_rate': pos_sampling_rate, 'angle_times':
-                      np.array(angle_times), 'nShanks': nShanks, 'nCells': nCells_per_shank,
-                      'spike_times': spike_times, 'cells_with_weird_clustering': wrong_count_shanks}
+    data_to_return = {'session' : session, 'state_times' : state_times, 'angle_list' :
+        np.array(angle_list), 'pos_sampling_rate': pos_sampling_rate, 'angle_times' :
+        np.array(angle_times), 'nShanks': nShanks, 'nCells': nCells_per_shank,
+        'spike_times': spike_times, 'cells_with_weird_clustering': wrong_count_shanks}
 
     return data_to_return
