@@ -1,6 +1,9 @@
 '''March 21st 2019
 Run dimensionality reduction on spike counts.
 '''
+import os
+gen_fn_dir = os.path.abspath('..') + '/shared_scripts'
+sys.path.append(gen_fn_dir)
 
 from __future__ import division
 from dim_red_fns import run_dim_red
@@ -10,7 +13,6 @@ import numpy as np
 import numpy.linalg as la
 import sys
 import time
-import os
 import datetime
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -20,8 +22,7 @@ sd = int((time.time() % 1)*(2**31))
 np.random.seed(sd)
 curr_date = datetime.datetime.now().strftime('%Y_%m_%d')+'_'
 
-gen_fn_dir = os.path.abspath('..') + '/shared_scripts'
-sys.path.append(gen_fn_dir)
+
 
 
 gen_params = gff.load_pickle_file('../general_params/general_params.p')

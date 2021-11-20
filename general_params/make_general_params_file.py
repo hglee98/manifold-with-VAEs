@@ -2,11 +2,12 @@
 Create a few shared parameters and save them in a file.
 '''
 
-from general_file_fns import save_pickle_file
-import sys
 import os
+import sys
 gen_fn_dir = os.path.abspath('..') + '/shared_scripts'
 sys.path.append(gen_fn_dir)
+
+from general_file_fns import save_pickle_file
 
 param_dict = {}
 # Some commonly used paths

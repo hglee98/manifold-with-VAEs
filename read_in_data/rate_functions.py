@@ -7,15 +7,17 @@ Two methods to get rates: either using non-overlapping bins or convolving with
 a Gaussian kernel. The non-overlapping bins method is currently not being
 used (and won't work), but the option is here for historical reasons.
 '''
+import sys
+import os
+gen_fn_dir = os.path.abspath('../shared_scripts/')
+sys.path.append(gen_fn_dir)
 
 from __future__ import division
 from angle_fns import circmean
 import numpy as np
-import sys
-import os
 
-gen_fn_dir = os.path.abspath('../shared_scripts/')
-sys.path.append(gen_fn_dir)
+
+
 
 
 def get_rates_and_angles_by_interval(inp_data, params, smooth_type='kernel', just_wake=True):

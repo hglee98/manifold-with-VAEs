@@ -2,17 +2,19 @@
 Functions to take raw data in the form of .ang, .pos, .clu, and .res files and output
 python-friendly data structures that gather all information together.'''
 
+import os
+import sys
+gen_fn_dir = os.path.abspath('..') + '/shared_scripts'
+sys.path.append(gen_fn_dir)
+
 from __future__ import division
 import general_file_fns as gff
 import numpy as np
-import sys
 import time
 import glob
 import re
-import os
 
-gen_fn_dir = os.path.abspath('..') + '/shared_scripts'
-sys.path.append(gen_fn_dir)
+
 
 
 def match_spikes_to_cells(cluster_file_path, timing_file_path, verbose=True):

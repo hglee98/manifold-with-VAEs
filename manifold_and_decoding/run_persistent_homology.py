@@ -2,15 +2,17 @@
 Use Ripser to get Betti bar codes from saved rates. If nCells > 10, dim reduce 
 spike counts using Isomap. Threshold out low density points if thrsh is True.
 '''
-
+import os
+gen_fn_dir = os.path.abspath('..') + '/shared_scripts'
+import sys
+sys.path.append(gen_fn_dir)
 from __future__ import division
 from sklearn import neighbors
 from scipy.spatial.distance import pdist
 from dim_red_fns import run_dim_red
 from binned_spikes_class import spike_counts
 import general_file_fns as gff
-import sys
-import os
+
 import time
 import datetime
 import numpy as np
@@ -22,8 +24,7 @@ sd = int((time.time() % 1)*(2**31))
 np.random.seed(sd)
 curr_date = datetime.datetime.now().strftime('%Y_%m_%d')+'_'
 
-gen_fn_dir = os.path.abspath('..') + '/shared_scripts'
-sys.path.append(gen_fn_dir)
+
 
 
 gen_params = gff.load_pickle_file('../general_params/general_params.p')

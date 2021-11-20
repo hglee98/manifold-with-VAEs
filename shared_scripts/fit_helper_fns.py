@@ -10,9 +10,6 @@ import sys
 import os
 from sklearn.neighbors import NearestNeighbors
 
-gen_fn_dir = os.path.abspath('../..') + '/shared_scripts'
-sys.path.append(gen_fn_dir)
-
 
 def get_closest_manifold_coords(mani_pts, mani_coords, input_pts, return_all=False):
     '''Use the nearest neighbors function to project input_pts to the 

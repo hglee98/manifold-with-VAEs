@@ -2,6 +2,11 @@
 Decode from saved fit 
 '''
 
+import os
+import sys
+gen_fn_dir = os.path.abspath('..') + '/shared_scripts'
+sys.path.append(gen_fn_dir)
+
 from __future__ import division
 import angle_fns as af
 import distribution_fns as df
@@ -11,8 +16,6 @@ from binned_spikes_class import spike_counts
 import general_file_fns as gff
 import numpy as np
 import numpy.linalg as la
-import sys
-import os
 import glob
 import time
 import datetime
@@ -23,8 +26,7 @@ sd = int((time.time() % 1)*(2**31))
 np.random.seed(sd)
 curr_date = datetime.datetime.now().strftime('%Y_%m_%d')+'_'
 
-gen_fn_dir = os.path.abspath('..') + '/shared_scripts'
-sys.path.append(gen_fn_dir)
+
 
 gen_params = gff.load_pickle_file('../general_params/general_params.p')
 

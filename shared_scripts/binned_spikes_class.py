@@ -2,15 +2,11 @@
 November 8th 2018
 Interface to the binned spike counts/rate estimates. 
 '''
-
+import sys
+import os
 from __future__ import division
 from general_file_fns import load_pickle_file, save_pickle_file
 import numpy as np
-import sys
-import os
-
-gen_fn_dir = os.path.abspath('..') + '/shared_scripts'
-sys.path.append(gen_fn_dir)
 
 
 gen_params = load_pickle_file('../general_params/general_params.p')

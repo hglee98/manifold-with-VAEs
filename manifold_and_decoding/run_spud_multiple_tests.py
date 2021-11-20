@@ -2,6 +2,10 @@
 Fit the wake manifold and do decoding. This version runs multiple cross-validated
 tries and plots the distribution of decoding errors.
 '''
+import sys
+import os
+gen_fn_dir = os.path.abspath('..') + '/shared_scripts'
+sys.path.append(gen_fn_dir)
 
 from __future__ import division
 import manifold_fit_and_decode_fns as mff
@@ -10,8 +14,7 @@ from binned_spikes_class import spike_counts
 import general_file_fns as gff
 import numpy as np
 import numpy.linalg as la
-import sys
-import os
+
 import time
 import datetime
 import matplotlib.pyplot as plt
@@ -22,8 +25,6 @@ sd = int((time.time() % 1)*(2**31))
 np.random.seed(sd)
 curr_date = datetime.datetime.now().strftime('%Y_%m_%d')+'_'
 
-gen_fn_dir = os.path.abspath('..') + '/shared_scripts'
-sys.path.append(gen_fn_dir)
 
 gen_params = gff.load_pickle_file('../general_params/general_params.p')
 
