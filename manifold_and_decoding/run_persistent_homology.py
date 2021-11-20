@@ -4,34 +4,36 @@ spike counts using Isomap. Threshold out low density points if thrsh is True.
 '''
 
 from __future__ import division
-import sys, os
-import time, datetime
+from sklearn import neighbors
+from scipy.spatial.distance import pdist
+from dim_red_fns import run_dim_red
+from binned_spikes_class import spike_counts
+import general_file_fns as gff
+import sys
+import os
+import time
+import datetime
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from ripser import ripser as tda
 
-sd=int((time.time()%1)*(2**31))
+sd = int((time.time() % 1)*(2**31))
 np.random.seed(sd)
-curr_date=datetime.datetime.now().strftime('%Y_%m_%d')+'_'
+curr_date = datetime.datetime.now().strftime('%Y_%m_%d')+'_'
 
 gen_fn_dir = os.path.abspath('..') + '/shared_scripts'
 sys.path.append(gen_fn_dir)
 
-import general_file_fns as gff
 
 gen_params = gff.load_pickle_file('../general_params/general_params.p')
 
-from binned_spikes_class import spike_counts
-from dim_red_fns import run_dim_red
-from scipy.spatial.distance import pdist
-from sklearn import neighbors
 
 save_dir = gff.return_dir(gen_params['results_dir'] + '2019_03_22_tda/')
 
 plot_barcode = True
 cmd_line = False
-# if thrsh is True then we threshold out low density points (nt-TDA in the 
+# if thrsh is True then we threshold out low density points (nt-TDA in the
 # paper)
 if cmd_line:
     session = sys.argv[1]
@@ -96,7 +98,7 @@ barcodes = tda(H1_rates, maxdim=1, coeff=2)['dgms']
 results['h0'] = barcodes[0]
 results['h1'] = barcodes[1]
 
-# H2. Need to subsample points for computational tractability if 
+# H2. Need to subsample points for computational tractability if
 # number of points is large (can go higher but very slow)
 if len(rates) > 1500:
     idx = np.random.choice(np.arange(len(rates)), 1500, replace=False)
@@ -107,7 +109,8 @@ barcodes = tda(H2_rates, maxdim=2, coeff=2)['dgms']
 results['h2'] = barcodes[2]
 
 # save
-gff.save_pickle_file(results, save_dir + '%s_%s%s_ph_barcodes.p' % (session, state, ('_thresholded' * thrsh)))
+gff.save_pickle_file(results, save_dir + '%s_%s%s_ph_barcodes.p' %
+                     (session, state, ('_thresholded' * thrsh)))
 
 # If plotting from a saved file, uncomment this and replace with appropriate file.
 # results = gff.load_pickle_file(gen_params['results_dir'] + '2019_03_22_tda/Mouse28-140313_Wake_ph_barcodes.p')
@@ -118,12 +121,12 @@ if plot_barcode:
     # replace the infinity bar (-1) in H0 by a really large number
     h0[~np.isfinite(h0)] = 100
     # Plot the longest barcodes only
-    plot_prcnt = [99, 98, 90] # order is h0, h1, h2
+    plot_prcnt = [99, 98, 90]  # order is h0, h1, h2
     to_plot = []
     for curr_h, cutoff in zip([h0, h1, h2], plot_prcnt):
-         bar_lens = curr_h[:,1] - curr_h[:,0]
-         plot_h = curr_h[bar_lens > np.percentile(bar_lens, cutoff)]
-         to_plot.append(plot_h)
+        bar_lens = curr_h[:, 1] - curr_h[:, 0]
+        plot_h = curr_h[bar_lens > np.percentile(bar_lens, cutoff)]
+        to_plot.append(plot_h)
 
     fig = plt.figure(figsize=(10, 8))
     gs = gridspec.GridSpec(3, 4)
@@ -131,7 +134,7 @@ if plot_barcode:
         ax = fig.add_subplot(gs[curr_betti, :])
         for i, interval in enumerate(reversed(curr_bar)):
             ax.plot([interval[0], interval[1]], [i, i], color=col_list[curr_betti],
-                lw=1.5)
+                    lw=1.5)
         # ax.set_xlim([0, xlim])
         # ax.set_xticks([0, xlim])
         ax.set_ylim([-1, len(curr_bar)])
