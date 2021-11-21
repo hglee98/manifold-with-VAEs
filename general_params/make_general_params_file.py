@@ -35,4 +35,5 @@ param_dict['cols'] = {'REM': (0.392, 0.549, 0.0784),
                       'SWS': (0.824, 0.627, 0.0392), 'Wake': (0.0118, 0.235, 0.392),
                       'measured': (0.3, 0.3, 0.3), 'fit': (0.490, 0.961, 0.961)}
 
+print(param_dict)
 save_pickle_file(param_dict, 'general_params.p')
