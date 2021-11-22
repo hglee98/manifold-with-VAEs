@@ -28,14 +28,15 @@ gen_params = gff.load_pickle_file('../general_params/general_params.p')
 
 session = 'Mouse28-140313'
 
-make_processed_files = False
-make_rates = False
-print_data = True
+make_processed_files = True
+make_rates = True
+print_data = False
 
 if make_processed_files:
     data_path = gen_params['raw_data_dir'] + session + '/'
     params = {'session': 'Mouse28-140313', 'data_path': data_path,
               'eeg_sampling_rate': 1250., 'spike_sampling_interval': 1.0 / (20e3)}
+
     data = drf.gather_session_spike_info(params)
     save_dir = gff.return_dir(gen_params['processed_data_dir'])
     gff.save_pickle_file(data, save_dir + '%s.p' % session)
@@ -44,11 +45,11 @@ if make_rates:
     print('Getting kernel rates')
     t0 = time.time()
     sigma = 0.1
-    params = {'dt': 0.05, 'method': 'gaussian', 'sigma': sigma}
+    params = {'dt': 0.05, 'method': 'gaussian', 'sigma': sigma} #Parameter time_interval=50ms
     inp_data = gff.load_pickle_file(gen_params['processed_data_dir'] +
                                     '%s.p' % session)
     rates = rf.get_rates_and_angles_by_interval(inp_data, params, smooth_type='kernel',
-                                                just_wake=True)
+                                                just_wake=False)
     save_dir = gff.return_dir(
         gen_params['kernel_rates_dir'] + '%0.0fms_sigma/' % (sigma*1000))
     gff.save_pickle_file(rates, save_dir + '%s.p' % session)

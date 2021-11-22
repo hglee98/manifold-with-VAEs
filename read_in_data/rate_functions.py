@@ -48,7 +48,7 @@ def get_rates_and_angles_by_interval(inp_data, params, smooth_type='kernel', jus
 
     for state in states:
         for i, tmp_interval in enumerate(inp_data['state_times'][state]):
-            interval = tuple(tmp_interval)
+            interval = tuple(tmp_interval) #단위에 대한 의문
             print(state, interval)
             out_data[state][interval] = {}
             if smooth_type == 'kernel':
@@ -81,6 +81,7 @@ def get_rates_angles_kernel_dict(inp_data, params, interval):
     angle_list = inp_data['angle_list']
     samp_rate = inp_data['pos_sampling_rate']
     dt = params['dt']
+    # time_bin =  50ms? interval from bin_edge to bin_edge
 
     bin_edges = np.arange(interval[0], interval[1], dt)
     time_vals = bin_edges[:-1] + (dt / 2.)

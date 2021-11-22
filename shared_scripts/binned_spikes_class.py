@@ -2,9 +2,9 @@
 November 8th 2018
 Interface to the binned spike counts/rate estimates. 
 '''
+from __future__ import division
 import sys
 import os
-from __future__ import division
 from general_file_fns import load_pickle_file, save_pickle_file
 import numpy as np
 

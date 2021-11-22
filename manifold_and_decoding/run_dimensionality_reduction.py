@@ -1,17 +1,17 @@
 '''March 21st 2019
 Run dimensionality reduction on spike counts.
 '''
+from __future__ import division
 import os
+import sys
 gen_fn_dir = os.path.abspath('..') + '/shared_scripts'
 sys.path.append(gen_fn_dir)
 
-from __future__ import division
 from dim_red_fns import run_dim_red
 from binned_spikes_class import spike_counts
 import general_file_fns as gff
 import numpy as np
 import numpy.linalg as la
-import sys
 import time
 import datetime
 import matplotlib.pyplot as plt
@@ -41,9 +41,11 @@ if command_line:
     desired_nSamples = int(sys.argv[5])
 else:
     session = 'Mouse28-140313'
-    state = 'Wake'  # state2 = 'REM'
-    condition = 'solo'
+    state = 'Wake'
+    state2 = 'REM'
+    condition = 'joint'
     target_dim = 3
+# target dimension은 3 또는 2
     desired_nSamples = 15000
 
 print('Session %s, condition %s, target_dim %d, desired_nSamples %d' % (session, condition,

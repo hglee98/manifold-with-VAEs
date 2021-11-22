@@ -13,9 +13,9 @@ def load_file_from_pattern(file_pattern):
     if len(file_matches) == 0:
         print('No file found')
         return
-    fname = file_matches[0]
-    data = load_pickle_file(fname)
-    return data, fname
+    filename = file_matches[0]
+    data = load_pickle_file(filename)
+    return data, filename
 
 
 def load_pickle_file(filename):
