@@ -37,3 +37,13 @@ param_dict['cols'] = {'REM': (0.392, 0.549, 0.0784),
 
 print(param_dict)
 save_pickle_file(param_dict, 'general_params.p')
+
+
+#param_dictionary 현재까지의 구조
+# 'raw_data_dir': base_dir + 'raw_data/',
+# 'processed_data_dir': base_dir + 'processed/',
+# 'kernel_rates_dir': base_dir + 'analyses/2019_03_kernel_rates/' it depends on session
+# 'result_dir': base_dir + "analyses/",
+# 'cols': {},
+# }
+
