@@ -13,13 +13,19 @@ import numpy.linalg as la
 import sys, os
 import time, datetime
 import pandas as pd
+import re
 
 gen_fn_dir = os.path.abspath('..') + '/shared_scripts'
 sys.path.append(gen_fn_dir)
-
 import general_file_fns as gff
 import data_read_fns as drf
 import rate_functions as rf
+
+
+def is_session(x):
+    p = re.compile(r'Mouse\d\d-\d\d\d\d\d\d$')
+    result = True if p.match(x) else False
+    return result
 
 # Paths to save the data are in this dict. If you haven't already, edit
 # general_params/make_general_params_file.py to set the paths you want
@@ -28,9 +34,15 @@ gen_params = gff.load_pickle_file('../general_params/general_params.p')
 
 session = 'Mouse28-140313'
 
-make_processed_files = True
-make_rates = True
+make_processed_files = False
+make_rates = False
 print_data = False
+
+data_path = gen_params['raw_data_dir'] + '/'
+folder_list = os.listdir(data_path)
+print(folder_list)
+session_list = [x for x in folder_list if is_session(x)]
+print(session_list)
 
 if make_processed_files:
     data_path = gen_params['raw_data_dir'] + session + '/'

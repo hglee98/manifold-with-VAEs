@@ -11,7 +11,7 @@ from general_file_fns import save_pickle_file
 
 param_dict = {}
 # Some commonly used paths
-base_dir = '/Volumes/Samsung T7/Research copy/Manifold learning with VAE/'
+base_dir = '/Volumes/ThePassport/Research/Manifold learning with VAE/'
 # Location where Peyrache et al data is unzipped
 param_dict['raw_data_dir'] = base_dir + 'raw_data/'
 
@@ -25,7 +25,7 @@ param_dict['processed_data_dir'] = base_dir + 'processed/'
 
 # Firing rates estimated by convolution with Gaussian kernel. Again, generated
 # by read_in_data/preprocess_raw_data.py and directory created if needed.
-param_dict['kernel_rates_dir'] = base_dir + 'analyses/2019_03_kernel_rates/'
+param_dict['kernel_rates_dir'] = base_dir + 'analyses/2021_11_kernel_rates/'
 
 # Analyses and results will be saved under this directory (and loaded from here too).
 param_dict['results_dir'] = base_dir + 'analyses/'
