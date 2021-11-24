@@ -27,15 +27,13 @@ def is_session(x):
     result = True if p.match(x) else False
     return result
 
+
 # Paths to save the data are in this dict. If you haven't already, edit
 # general_params/make_general_params_file.py to set the paths you want
 # and run it to generate general_params.p
 gen_params = gff.load_pickle_file('../general_params/general_params.p')
-
-session = 'Mouse28-140313'
-
-make_processed_files = False
-make_rates = False
+make_processed_files = True
+make_rates = True
 print_data = False
 
 data_path = gen_params['raw_data_dir'] + '/'
@@ -44,29 +42,39 @@ print(folder_list)
 session_list = [x for x in folder_list if is_session(x)]
 print(session_list)
 
-if make_processed_files:
-    data_path = gen_params['raw_data_dir'] + session + '/'
-    params = {'session': 'Mouse28-140313', 'data_path': data_path,
-              'eeg_sampling_rate': 1250., 'spike_sampling_interval': 1.0 / (20e3)}
 
-    data = drf.gather_session_spike_info(params)
-    save_dir = gff.return_dir(gen_params['processed_data_dir'])
-    gff.save_pickle_file(data, save_dir + '%s.p' % session)
+if make_processed_files:
+    for session in session_list:
+        data_path = gen_params['raw_data_dir'] + session + '/'
+        params = {'session': session, 'data_path': data_path,
+                  'eeg_sampling_rate': 1250., 'spike_sampling_interval': 1.0 / 20e3}
+        if os.path.isfile(gen_params['processed_data_dir'] + '%s.p' % session):  # preprocessing 중복 방지(시간 절약)
+            continue
+        print(session)
+        data = drf.gather_session_spike_info(params)
+        save_dir = gff.return_dir(gen_params['processed_data_dir'])
+        gff.save_pickle_file(data, save_dir + '%s.p' % session)
 
 if make_rates:
-    print('Getting kernel rates')
-    t0 = time.time()
-    sigma = 0.1
-    params = {'dt': 0.05, 'method': 'gaussian', 'sigma': sigma} #Parameter time_interval=50ms
-    inp_data = gff.load_pickle_file(gen_params['processed_data_dir'] +
-                                    '%s.p' % session)
-    rates = rf.get_rates_and_angles_by_interval(inp_data, params, smooth_type='kernel',
-                                                just_wake=False)
-    save_dir = gff.return_dir(
-        gen_params['kernel_rates_dir'] + '%0.0fms_sigma/' % (sigma*1000))
-    gff.save_pickle_file(rates, save_dir + '%s.p' % session)
-    print('Time ', time.time() - t0)
+    for session in session_list:
+        print('Getting kernel rates for ' + session)
+        t0 = time.time()
+        sigma = 0.1
+        params = {'dt': 0.05, 'method': 'gaussian', 'sigma': sigma}  # Parameter time_interval=50ms
+        save_dir = gff.return_dir(
+            gen_params['kernel_rates_dir'] + '%0.0fms_sigma/' % (sigma * 1000))
 
+        if os.path.isfile(save_dir + '%s.p' % session): # preprocessing 중복 방지(시간 절약)
+            continue
+
+        inp_data = gff.load_pickle_file(gen_params['processed_data_dir'] +
+                                        '%s.p' % session)
+
+        rates = rf.get_rates_and_angles_by_interval(inp_data, params, smooth_type='kernel',
+                                                    just_wake=True)
+
+        gff.save_pickle_file(rates, save_dir + '%s.p' % session)
+        print('Time ', time.time() - t0)
 
 if print_data:
     print('Printing Wake kernel rates data')
@@ -74,7 +82,7 @@ if print_data:
     inp_data = gff.load_pickle_file(gen_params['kernel_rates_dir'] +
                                     '%0.0fms_sigma/' % (sigma * 1000) + '%s.p' % session)
     states = inp_data.keys()
-    #print(states)
+    # print(states)
     for state in states:
         if state == "Wake":
             for tmp_interval in inp_data["Wake"]:

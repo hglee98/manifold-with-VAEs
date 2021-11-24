@@ -2,6 +2,13 @@
 Run dimensionality reduction on spike counts.
 '''
 from __future__ import division
+import numpy as np
+import numpy.linalg as la
+import time
+import datetime
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from sklearn import decomposition, manifold
 import os
 import sys
 gen_fn_dir = os.path.abspath('..') + '/shared_scripts'
@@ -10,26 +17,17 @@ sys.path.append(gen_fn_dir)
 from dim_red_fns import run_dim_red
 from binned_spikes_class import spike_counts
 import general_file_fns as gff
-import numpy as np
-import numpy.linalg as la
-import time
-import datetime
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-from sklearn import decomposition, manifold
+
 
 sd = int((time.time() % 1)*(2**31))
 np.random.seed(sd)
 curr_date = datetime.datetime.now().strftime('%Y_%m_%d')+'_'
 
-
-
-
 gen_params = gff.load_pickle_file('../general_params/general_params.p')
 
 
 cols = gen_params['cols']
-dir_to_save = gff.return_dir(gen_params['results_dir'] + '2019_06_03_dim_red/')
+dir_to_save = gff.return_dir(gen_params['results_dir'] + '2021_11_24_dim_red/')
 
 command_line = False
 if command_line:
@@ -40,12 +38,12 @@ if command_line:
     target_dim = int(sys.argv[4])
     desired_nSamples = int(sys.argv[5])
 else:
-    session = 'Mouse28-140313'
+    session = 'Mouse12-120810'
     state = 'Wake'
-    state2 = 'REM'
-    condition = 'joint'
+    # state2 = 'REM'  # state2 is needed when the condition is 'joint'
+    condition = 'solo'  # 'solo' or 'joint'
     target_dim = 3
-# target dimension은 3 또는 2
+# target dimension 은 3 또는 2
     desired_nSamples = 15000
 
 print('Session %s, condition %s, target_dim %d, desired_nSamples %d' % (session, condition,
@@ -108,5 +106,11 @@ if to_plot:
         if condition == 'joint':
             ax.scatter(to_save[state2][:, 0], to_save[state2][:, 1], to_save[state2][:, 2],
                        s=5, alpha=0.4, edgecolor='face', c=cols[state2])
-    ax.set_title('Session %s' % (session))
+    ax.set_title('Session %s' % session)
+    if condition == 'solo':
+        plt.savefig(gen_params['figures_dir']+'%s_%s.png' % (session, state))
+    elif condition == 'joint':
+        plt.savefig(gen_params['figures_dir']+'%s_%s,%s.png' % (session, state, state2))
     plt.show()
+
+

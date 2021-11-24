@@ -29,6 +29,7 @@ param_dict['kernel_rates_dir'] = base_dir + 'analyses/2021_11_kernel_rates/'
 
 # Analyses and results will be saved under this directory (and loaded from here too).
 param_dict['results_dir'] = base_dir + 'analyses/'
+param_dict['figures_dir'] = base_dir + 'figures/'
 
 # Colors for the plots.
 param_dict['cols'] = {'REM': (0.392, 0.549, 0.0784),

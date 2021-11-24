@@ -43,7 +43,7 @@ def match_spikes_to_cells(cluster_file_path, timing_file_path, verbose=True):
     # artifacts and 1 to noise)
     nClusters = tmp_clusters[0]
     cluster_ids = list(tmp_clusters[1:])
-    if nClusters <= 2:  # ony clusters are 0 and 1; so no cells
+    if nClusters <= 2:  # only clusters are 0 and 1; so no cells
         print('No cells found')
         nCells = 0
         spike_times = []
@@ -51,7 +51,7 @@ def match_spikes_to_cells(cluster_file_path, timing_file_path, verbose=True):
     if np.max(cluster_ids) != (nClusters - 1):  #cluster의 개수가 첫줄에서 얘기하는 것과 다른경우
         print('Clusters listed at beginning of file do not agree')
         nCells = np.nan
-        spike_times = []
+        spike_times = []  # interpolation을 해서 채우는 것이 좋은지 혹은 이와 같이 Nan 처리를 하는 것이 좋은지..
         return nCells, spike_times
 
     # Now break this up in various cells
@@ -65,6 +65,7 @@ def match_spikes_to_cells(cluster_file_path, timing_file_path, verbose=True):
     nCells = nClusters - 2  # since 0/1 are noise; subtract from nCluster
 
     return nCells, spike_times
+
 
 def gather_session_spike_info(params, verbose=True):
     '''Gather data from the downloaded files.
@@ -143,6 +144,7 @@ def gather_session_spike_info(params, verbose=True):
                     'spike_sampling_interval'] * tmp_spike_list[curr_cell]
 
     # Check for shanks where the number of clusters doesn't equal number of listed cells
+    # 갯수가 맞지 않으면 실행 불가인 것인가? 테스트해보기
     wrong_count_shanks = np.sum(np.isnan(nCells_per_shank))
     if wrong_count_shanks and verbose:
         print('\nThe number of shanks with wrong number of cells listed is', wrong_count_shanks)

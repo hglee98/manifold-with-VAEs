@@ -1,11 +1,12 @@
 '''March 25th 2019
 More interactive version of SPUD fitting.'''
+from __future__ import division
 import os
+import sys
 
 gen_fn_dir = os.path.abspath('..') + '/shared_scripts'
-import sys
 sys.path.append(gen_fn_dir)
-from __future__ import division
+
 from dim_red_fns import run_dim_red
 import fit_helper_fns as fhf
 import manifold_fit_and_decode_fns as mff
