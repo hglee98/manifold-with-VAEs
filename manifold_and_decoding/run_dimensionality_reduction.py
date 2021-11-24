@@ -38,7 +38,7 @@ if command_line:
     target_dim = int(sys.argv[4])
     desired_nSamples = int(sys.argv[5])
 else:
-    session = 'Mouse12-120810'
+    session = 'Mouse20-130514'
     state = 'Wake'
     # state2 = 'REM'  # state2 is needed when the condition is 'joint'
     condition = 'solo'  # 'solo' or 'joint'

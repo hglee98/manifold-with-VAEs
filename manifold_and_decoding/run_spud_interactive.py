@@ -32,7 +32,7 @@ gen_params = gff.load_pickle_file('../general_params/general_params.p')
 dir_to_save = gff.return_dir(
     gen_params['results_dir'] + '2019_06_03_interactive_curve_fits/')
 
-session = 'Mouse28-140313'
+session = 'Mouse20-130514'
 fit_dim = 3
 nKnots = 15
 knot_order = 'wt_per_len'

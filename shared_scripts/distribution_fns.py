@@ -8,9 +8,9 @@ from sklearn import metrics
 import angle_fns as af
 
 
-def get_angle_bins(nBins, bin_type='angle'):
+def get_angle_bins(num_bins, bin_type='angle'):
     '''Convenience function, since we do this so often'''
-    d_theta = 2 * np.pi / nBins
+    d_theta = 2 * np.pi / num_bins
     if bin_type == 'angle':
         bin_edges = np.arange(0, 2 * np.pi + 1e-10, d_theta)
     elif bin_type == 'delta':
@@ -80,9 +80,9 @@ def get_mean_in_bins(inp_array, bin_edges):
     # inp_array is N x T, and bin_edges is of the form [idx0, idx1, ...,idxN]
     # returns out_array of shape N x len(bin_edges)-1, where the 0-th column is
     # the average of inp_array[:,idx0:idx1], etc.
-    nBins = len(bin_edges) - 1
-    out_array = np.zeros((inp_array.shape[0], nBins))
-    for i, start_idx, end_idx in zip(np.arange(nBins), bin_edges[:-1], bin_edges[1:]):
+    num_bins = len(bin_edges) - 1
+    out_array = np.zeros((inp_array.shape[0], num_bins))
+    for i, start_idx, end_idx in zip(np.arange(num_bins), bin_edges[:-1], bin_edges[1:]):
         # print i, start_idx, end_idx
         out_array[:, i] = np.mean(inp_array[:, start_idx:end_idx], 1)
     return out_array
