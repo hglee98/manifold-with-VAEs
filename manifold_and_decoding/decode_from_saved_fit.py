@@ -1,13 +1,13 @@
 '''March 21st 2019
 Decode from saved fit 
 '''
+from __future__ import division
 
 import os
 import sys
 gen_fn_dir = os.path.abspath('..') + '/shared_scripts'
 sys.path.append(gen_fn_dir)
 
-from __future__ import division
 import angle_fns as af
 import distribution_fns as df
 import fit_helper_fns as fhf
@@ -45,7 +45,7 @@ embed_dim = 3
 train_frac = 0.8
 
 # Load the dimensionality reduced data
-dd = gen_params['results_dir'] + '2019_03_22_dim_red/'
+dd = gen_params['results_dir'] + '2021_11_24_dim_red/'
 file_pattern = '%s_%s_kern_%dms_sigma_%dms_binsep_%s_embed_%s_%ddims_%dneighbors_*.p' % (
     session, area, sigma * 1000, dt_kernel * 1000, state, method, embed_dim, n_neighbors)
 embed, embed_fname = gff.load_file_from_pattern(dd+file_pattern)

@@ -22,9 +22,9 @@ import data_read_fns as drf
 import rate_functions as rf
 
 
-def is_session(x):
+def is_session(fname):
     p = re.compile(r'Mouse\d\d-\d\d\d\d\d\d$')
-    result = True if p.match(x) else False
+    result = True if p.match(fname) else False
     return result
 
 
