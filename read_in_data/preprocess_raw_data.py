@@ -64,9 +64,6 @@ if make_rates:
         save_dir = gff.return_dir(
             gen_params['kernel_rates_dir'] + '%0.0fms_sigma/' % (sigma * 1000))
 
-        if os.path.isfile(save_dir + '%s.p' % session): # preprocessing 중복 방지(시간 절약)
-            continue
-
         inp_data = gff.load_pickle_file(gen_params['processed_data_dir'] +
                                         '%s.p' % session)
 
