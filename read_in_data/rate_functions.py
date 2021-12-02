@@ -48,7 +48,7 @@ def get_rates_and_angles_by_interval(inp_data, params, smooth_type='kernel', jus
 
     for state in states:
         for i, tmp_interval in enumerate(inp_data['state_times'][state]):
-            interval = tuple(tmp_interval) #단위에 대한 의문
+            interval = tuple(tmp_interval)  # 단위: 초
             print(state, interval)
             out_data[state][interval] = {}
             if smooth_type == 'kernel':

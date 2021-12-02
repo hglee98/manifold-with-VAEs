@@ -31,10 +31,13 @@ def is_session(fname):
 # Paths to save the data are in this dict. If you haven't already, edit
 # general_params/make_general_params_file.py to set the paths you want
 # and run it to generate general_params.p
+
+
 gen_params = gff.load_pickle_file('../general_params/general_params.p')
-make_processed_files = True
-make_rates = True
-print_data = False
+make_processed_files = False
+make_rates = False
+print_rates_data = False
+print_preprocessed_data = True
 
 data_path = gen_params['raw_data_dir'] + '/'
 folder_list = os.listdir(data_path)
@@ -73,23 +76,38 @@ if make_rates:
         gff.save_pickle_file(rates, save_dir + '%s.p' % session)
         print('Time ', time.time() - t0)
 
-if print_data:
-    print('Printing Wake kernel rates data')
-    sigma = 0.1
-    inp_data = gff.load_pickle_file(gen_params['kernel_rates_dir'] +
-                                    '%0.0fms_sigma/' % (sigma * 1000) + '%s.p' % session)
-    states = inp_data.keys()
-    # print(states)
-    for state in states:
-        if state == "Wake":
-            for tmp_interval in inp_data["Wake"]:
-                interval = tuple(tmp_interval)
-                print(inp_data[state][interval].keys())
-                print(" State: ", state, "\n", "Interval: ", interval)
-                print("RATES: ")
-                kernel_rates = pd.DataFrame.from_dict(inp_data[state][interval]['rates'], orient='index')
-                print(kernel_rates)
-                print("____________________________________________________________")
-                print("ANGLES: ")
-                angles = pd.DataFrame.from_dict(inp_data[state][interval]['angles'])
-                print(angles)
+if print_rates_data:
+    sys.stdout = open('preprocess_rates.txt', 'w')
+    for session in session_list:
+        print("**************************************************************************")
+        print('Printing Wake kernel rates data ' + session)
+        sigma = 0.1
+        inp_data = gff.load_pickle_file(gen_params['kernel_rates_dir'] +
+                                        '%0.0fms_sigma/' % (sigma * 1000) + '%s.p' % session)
+        states = inp_data.keys()
+        # print(states)
+        for state in states:
+            if state == "Wake":
+                for tmp_interval in inp_data["Wake"]:
+                    interval = tuple(tmp_interval)
+                    print(inp_data[state][interval].keys())
+                    print(" State: ", state, "\n", "Interval: ", interval)
+                    print("RATES: ")
+                    kernel_rates = pd.DataFrame.from_dict(inp_data[state][interval]['rates'], orient='index')
+                    print(kernel_rates)
+                    print("____________________________________________________________")
+                    print("ANGLES: ")
+                    angles = pd.DataFrame.from_dict(inp_data[state][interval]['angles'])
+                    print(angles)
+    sys.stdout.close()
+
+if print_preprocessed_data:
+    # sys.stdout = open('processed.txt', 'w')
+    for session in session_list:
+        print("**************************************************************************")
+        print("Printing Processed data " + session)
+        processed_data = gff.load_pickle_file(gen_params['processed_data_dir'] + '%s.p' % session)
+        print(processed_data.keys())
+        print(processed_data['pos_sampling_rate'])
+        print("\n")
+    # sys.stdout.close()
