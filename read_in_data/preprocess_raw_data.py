@@ -39,6 +39,7 @@ make_rates = False
 print_rates_data = False
 print_preprocessed_data = True
 
+
 data_path = gen_params['raw_data_dir'] + '/'
 folder_list = os.listdir(data_path)
 print(folder_list)
@@ -95,10 +96,17 @@ if print_rates_data:
                     print("RATES: ")
                     kernel_rates = pd.DataFrame.from_dict(inp_data[state][interval]['rates'], orient='index')
                     print(kernel_rates)
-                    print("____________________________________________________________")
+                    print("_______________________________________________________________________")
+                    rate_times = pd.DataFrame.from_dict(inp_data[state][interval]['rate_times'])
+                    print(rate_times)
+                    print("_______________________________________________________________________")
                     print("ANGLES: ")
                     angles = pd.DataFrame.from_dict(inp_data[state][interval]['angles'])
                     print(angles)
+                    print("_______________________________________________________________________")
+                    print("ANGLE_TIMES: ")
+                    angle_times = pd.DataFrame.from_dict(inp_data[state][interval]['angle_times'])
+
     sys.stdout.close()
 
 if print_preprocessed_data:

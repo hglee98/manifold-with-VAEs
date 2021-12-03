@@ -91,7 +91,7 @@ class spike_counts:
         interval_list = sorted(self.spike_data[state].keys())
 
         for i, interval in enumerate(interval_list):
-            # Get the appropriat single_intvl_dict
+            # Get the appropriate single_interval_dict
             tmp_interval, curr_interval_dict, curr_angles = self.single_intvl_dict(
                 state, interval_num=i)
 
