@@ -50,10 +50,10 @@ print('Session %s, condition %s, target_dim %d, desired_nSamples %d' % (session,
                                                                         target_dim, desired_nSamples))
 area = 'ADn'
 dt_kernel = 0.1
-sigma = 0.1  # Kernel width
+sigma = 0.1  # Kernel width => 100ms
 rate_params = {'dt': dt_kernel, 'sigma': sigma}
-method = 'iso'
-n_neighbors = 5
+method = 'iso'  # isomap demensional reduction algorithm
+n_neighbors = 5  # 이웃 노드의 개수
 dim_red_params = {'n_neighbors': n_neighbors, 'target_dim': target_dim}
 to_plot = True
 
@@ -62,8 +62,12 @@ session_rates = spike_counts(session, rate_params, count_type='rate',
 
 t0 = time.time()
 if condition == 'solo':
-    counts, tmp_angles = session_rates.get_spike_matrix(state)
+    counts, tmp_angles = session_rates.get_spike_matrix(state)  # count 변수 중 desired_nSample 만큼 slice하여 Manifold Learning 수행함.
     sel_counts = counts[:desired_nSamples]
+    print(sel_counts)
+    sys.exit()
+    # _______________________________________________for checking target variable for manifold learning
+
     proj = run_dim_red(sel_counts, params=dim_red_params, method=method)
     to_save = {'seed': sd, state: proj,
                'meas_angles': tmp_angles[:desired_nSamples]}
