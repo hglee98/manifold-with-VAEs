@@ -19,3 +19,9 @@ def run_dim_red(inp_data, params, method='iso', stabilize=True):
                                        n_components=params['target_dim'])
         proj_data = iso_instance.fit_transform(data_to_use)
     return proj_data
+
+
+def run_vae(inp_data, params):
+    proj_data = 123  # temporary
+
+    return proj_data
