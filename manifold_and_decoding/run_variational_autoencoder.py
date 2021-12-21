@@ -52,5 +52,6 @@ to_plot = True
 t0 = time.time()
 
 if condition == 'solo':
-
+    a = 1
 elif condition == 'joint':
+    b = 1
