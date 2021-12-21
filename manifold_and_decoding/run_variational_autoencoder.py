@@ -42,3 +42,15 @@ else:
 
 print('Session %s, condition %s, target_dim %d, desired_nSamples %d' % (session, condition,
                                                                         target_dim, desired_nSamples))
+area = 'ADn'
+dt_kernel = 0.1  # subsampling interval (it should be a multiple of 0.05)
+sigma = 0.1  # sigma is equal to 100ms
+rate_params = {'dt': dt_kernel, 'sigma': sigma}
+method = 'vae'
+to_plot = True
+
+t0 = time.time()
+
+if condition == 'solo':
+
+elif condition == 'joint':
