@@ -38,7 +38,7 @@ if command_line:
     target_dim = int(sys.argv[4])
     desired_nSamples = int(sys.argv[5])
 else:
-    session = 'Mouse28-140313'
+    session = 'Mouse12-120810'
     state = 'Wake'
     # state2 = 'REM'  # state2 is needed when the condition is 'joint'
     condition = 'solo'  # 'solo' or 'joint'
@@ -52,7 +52,7 @@ area = 'ADn'  # Antero dorsal Nuclei
 dt_kernel = 0.1  # 이 값에 따라서 sample을 많이 추출할 수 있고, 적게 추출할 수 있다.(sub_sampling parameter)
 sigma = 0.1  # Kernel width => 100ms
 rate_params = {'dt': dt_kernel, 'sigma': sigma}
-method = 'iso'  # algorithm methods (available: iso, lle, tsne)
+method = 'lle'  # algorithm methods (available: iso, lle, tsne)
 n_neighbors = 5  # 이웃 노드의 개수
 dim_red_params = {'n_neighbors': n_neighbors, 'target_dim': target_dim}
 to_plot = True
