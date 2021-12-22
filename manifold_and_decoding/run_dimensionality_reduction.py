@@ -38,11 +38,11 @@ if command_line:
     target_dim = int(sys.argv[4])
     desired_nSamples = int(sys.argv[5])
 else:
-    session = 'Mouse12-120806'
+    session = 'Mouse28-140313'
     state = 'Wake'
     # state2 = 'REM'  # state2 is needed when the condition is 'joint'
     condition = 'solo'  # 'solo' or 'joint'
-    target_dim = 3
+    target_dim = 2
 # target dimension 은 3 또는 2
     desired_nSamples = 15000
 
@@ -52,7 +52,7 @@ area = 'ADn'  # Antero dorsal Nuclei
 dt_kernel = 0.1  # 이 값에 따라서 sample을 많이 추출할 수 있고, 적게 추출할 수 있다.(sub_sampling parameter)
 sigma = 0.1  # Kernel width => 100ms
 rate_params = {'dt': dt_kernel, 'sigma': sigma}
-method = 'iso'  # isometric mapping algorithm
+method = 'iso'  # algorithm methods (available: iso, lle, tsne)
 n_neighbors = 5  # 이웃 노드의 개수
 dim_red_params = {'n_neighbors': n_neighbors, 'target_dim': target_dim}
 to_plot = True
@@ -111,9 +111,9 @@ if to_plot:
                        s=5, alpha=0.4, edgecolor='face', c=cols[state2])
     ax.set_title('Session %s' % session)
     if condition == 'solo':
-        plt.savefig(gen_params['figures_dir']+'%s_%s.png' % (session, state))
+        plt.savefig(gen_params['figures_dir']+'%s_%s_%s.png' % (session, state, method))
     elif condition == 'joint':
-        plt.savefig(gen_params['figures_dir']+'%s_%s,%s.png' % (session, state, state2))
+        plt.savefig(gen_params['figures_dir']+'%s_%s,%s_%s.png' % (session, state, state2, method))
     plt.show()
 
 
