@@ -53,7 +53,7 @@ area = 'ADn'  # Antero dorsal Nuclei
 dt_kernel = 0.1  # 이 값에 따라서 sample을 많이 추출할 수 있고, 적게 추출할 수 있다.(sub_sampling parameter)
 sigma = 0.1  # Kernel width => 100ms
 rate_params = {'dt': dt_kernel, 'sigma': sigma}
-method = 'lle'  # algorithm methods (available: iso, lle, tsne)
+method = 'iso'  # algorithm methods (available: iso, lle, tsne)
 n_neighbors = 5  # 이웃 노드의 개수
 dim_red_params = {'n_neighbors': n_neighbors, 'target_dim': target_dim}
 to_plot = True
@@ -65,12 +65,9 @@ t0 = time.time()
 if condition == 'solo':
     counts, tmp_angles = session_rates.get_spike_matrix(state)  # count 변수 중 desired_nSample 만큼 slice하여 Manifold Learning 수행함.
     sel_counts = counts[:desired_nSamples]
-    b = torch.Tensor(sel_counts)
     # 위의 과정은 dt_kernel을 통해 subsampling을 하고 num of desired samples만큼 subsampling을 하는 과정이다.
     # _______________________________________________for checking target variable for manifold learning
-    print(b)
-    sys.exit()
-    proj = run_dim_red(sel_counts, params=dim_red_params, method=method)
+    proj = run_dim_red(sel_counts, params=dim_red_params, inp_dim=sel_count.shape[1], method=method)
     to_save = {'seed': sd, state: proj,
                'meas_angles': tmp_angles[:desired_nSamples]}
     fname = '%s_%s_kern_%dms_sigma_%dms_binsep_%s_embed_%s_%ddims_%dneighbors_%d.p' % (
@@ -117,6 +114,5 @@ if to_plot:
         plt.savefig(gen_params['figures_dir']+'%s_%s_%s.png' % (session, state, method))
     elif condition == 'joint':
         plt.savefig(gen_params['figures_dir']+'%s_%s,%s_%s.png' % (session, state, state2, method))
-    plt.show()
 
 
