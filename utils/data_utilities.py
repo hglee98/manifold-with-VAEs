@@ -18,22 +18,25 @@ state = 'Wake'
 
 class SpikeData(torch.utils.data.Dataset):
     def __init__(self, session):
-        dt_kernel = 0.1  # 이 값에 따라서 sample을 많이 추출할 수 있고, 적게 추출할 수 있다.(sub_sampling parameter)
+        dt_kernel = 0.1  # 이 값에 따라서 sample 을 많이 추출할 수 있고, 적게 추출할 수 있다.(sub_sampling parameter)
         sigma = 0.1  # Kernel width => 100ms
         rate_params = {'dt': dt_kernel, 'sigma': sigma}
         session_rates = spike_counts(session, rate_params, count_type='rate',
                                      anat_region='ADn')
         counts, tmp_angles = session_rates.get_spike_matrix(
-            state)  # count 변수 중 desired_nSample 만큼 slice하여 Manifold Learning 수행함.
-        self.data = torch.from_numpy(counts)
+            state)
+
+        self.feature_data = torch.from_numpy(counts)
+        self.label_data = torch.from_numpy(tmp_angles)
         self.n_samples = counts.shape[0]
         self.dim = counts.shape[1]
 
     def __getitem__(self, item):
-        return self.data[item]
+        return self.feature_data[item], self.label_data[item]
 
     def __len__(self):
         return self.n_samples
+
 
 def get_fmnist_loaders(data_dir, batch_size, shuffle=True):
     """Helper function that deserializes FashionMNIST data
