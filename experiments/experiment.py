@@ -31,7 +31,7 @@ class Experiment:
             self.train_loader, self.test_loader = get_kmnist_loaders(args.data_dir, args.batch_size)
             in_dim = 784
         elif self.dataset == "spike":
-            self.train_loader, self.test_loader, in_dim =du.get_spike_loaders(args.batch_size)
+            self.train_loader, self.test_loader, in_dim = du.get_spike_loaders(args.data_dir, args.batch_size)
 
         self.rvae_save_dir = os.path.join(args.save_dir, "RVAE/")
         self.vae_save_dir = os.path.join(args.save_dir, "VAE/")
