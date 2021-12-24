@@ -58,6 +58,6 @@ def get_spike_loaders(data_dir, batch_size, shuffle=True):
     dataset = SpikeData('Mouse12-120810')
     train_loader = DataLoader(dataset=dataset, batch_size=batch_size, shuffle=shuffle)
     test_loader = DataLoader(dataset=dataset, batch_size=batch_size, shuffle=False)
-    dim = dataset.shape[1]
+    dim = dataset.dim
 
     return train_loader, test_loader, dim
