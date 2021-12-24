@@ -2,6 +2,52 @@ import torch
 from torchvision.datasets import MNIST, FashionMNIST, KMNIST
 from torchvision.transforms import ToTensor
 from torch.utils.data import DataLoader, Dataset
+import numpy as np
+import os
+import sys
+
+gen_fn_dir = os.path.abspath('../..') + '/shared_scripts'
+sys.path.append(gen_fn_dir)
+from binned_spikes_class import spike_counts
+import general_file_fns as gff
+
+gen_params = gff.load_pickle_file('../general_params/general_params.p')
+session = 'Mouse12-120810'
+state = 'Wake'
+
+
+class SpikeData(torch.utils.data.Dataset):
+    def __init__(self, session):
+        dt_kernel = 0.1  # 이 값에 따라서 sample 을 많이 추출할 수 있고, 적게 추출할 수 있다.(sub_sampling parameter)
+        sigma = 0.1  # Kernel width => 100ms
+        rate_params = {'dt': dt_kernel, 'sigma': sigma}
+        session_rates = spike_counts(session, rate_params, count_type='rate',
+                                     anat_region='ADn')
+        counts, tmp_angles = session_rates.get_spike_matrix(
+            state)
+
+        tmp_angles = np.array(tmp_angles)
+        self.feature_data = torch.from_numpy(counts).float()
+        self.label_data = torch.from_numpy(tmp_angles).float()
+        self.label_data = torch.reshape(self.label_data, (-1, 1))
+        self.n_samples = counts.shape[0]
+        self.dim = counts.shape[1]
+
+    def __getitem__(self, item):
+        return self.feature_data[item], self.label_data[item]
+
+    def __len__(self):
+        return self.n_samples
+
+
+def get_spike_loaders(data_dir, batch_size, shuffle=True):
+    dataset = SpikeData('Mouse12-120810')
+    train_loader = DataLoader(dataset=dataset, batch_size=batch_size, shuffle=shuffle)
+    test_loader = DataLoader(dataset=dataset, batch_size=batch_size, shuffle=False)
+    dim = dataset.dim
+    print(dim)
+
+    return train_loader, test_loader, dim
 
 
 class CircleData(torch.utils.data.Dataset):

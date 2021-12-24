@@ -6,13 +6,9 @@ from itertools import chain
 
 from rvae.geoml import nnj
 from rvae.variational_inference.train import train_rvae, test_rvae, train_vae, test_vae
-from rvae.utils.data_utils import get_mnist_loaders, get_fmnist_loaders, get_kmnist_loaders
+from rvae.utils.data_utils import get_mnist_loaders, get_fmnist_loaders, get_kmnist_loaders, get_spike_loaders
 from rvae.models.vae import RVAE, VAE
 from rvae.utils.save_utils import save_model, load_model
-import sys, os
-fn_dir = os.path.abspath('..') + '/utils'
-sys.path.append(fn_dir)
-import data_utilities as du
 
 
 class Experiment:
@@ -31,7 +27,7 @@ class Experiment:
             self.train_loader, self.test_loader = get_kmnist_loaders(args.data_dir, args.batch_size)
             in_dim = 784
         elif self.dataset == "spike":
-            self.train_loader, self.test_loader, in_dim = du.get_spike_loaders(args.data_dir, args.batch_size)
+            self.train_loader, self.test_loader, in_dim = get_spike_loaders(args.data_dir, args.batch_size)
 
         self.rvae_save_dir = os.path.join(args.save_dir, "RVAE/")
         self.vae_save_dir = os.path.join(args.save_dir, "VAE/")
