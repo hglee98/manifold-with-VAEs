@@ -16,7 +16,7 @@ parser.add_argument("--warmup_learning_rate", default=1e-3, type=float, help="p_
 parser.add_argument("--sigma_learning_rate", default=1e-3, type=float, help="p_sigma learning rate")
 parser.add_argument("--mu_epochs", default=100, type=int, help="number of training epochs (decoder mu)")
 parser.add_argument("--sigma_epochs", default=100, type=int, help="number of training epochs (decoder sigma)")
-parser.add_argument("--device", default="cuda:0", type=str, help="cuda | cpu")
+parser.add_argument("--device", default="cpu", type=str, help="cuda | cpu")
 parser.add_argument("--seed", default=None, help="random seed")
 parser.add_argument("--log_invl", default=100, type=int, help="the interval in which training stats will be reported")
 parser.add_argument("--save_invl", default=25, type=int, help="the interval in which model weights will be saved")
