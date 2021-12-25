@@ -2,11 +2,12 @@ import torch
 from torchvision.datasets import MNIST, FashionMNIST, KMNIST
 from torchvision.transforms import ToTensor
 from torch.utils.data import DataLoader, Dataset
+from torch.utils.data.sampler import SubsetRandomSampler
 import numpy as np
 import os
 import sys
 
-gen_fn_dir = os.path.abspath('../..') + '/shared_scripts'
+gen_fn_dir = os.path.abspath('..') + '/shared_scripts'
 sys.path.append(gen_fn_dir)
 from binned_spikes_class import spike_counts
 import general_file_fns as gff
@@ -25,13 +26,15 @@ class SpikeData(torch.utils.data.Dataset):
                                      anat_region='ADn')
         counts, tmp_angles = session_rates.get_spike_matrix(
             state)
-
+        print(counts.shape)
         tmp_angles = np.array(tmp_angles)
         self.feature_data = torch.from_numpy(counts).float()
+        print(self.feature_data.shape)
         self.label_data = torch.from_numpy(tmp_angles).float()
         self.label_data = torch.reshape(self.label_data, (-1, 1))
         self.n_samples = counts.shape[0]
         self.dim = counts.shape[1]
+        self.feature_data = torch.reshape(self.feature_data, (-1, self.dim))
 
     def __getitem__(self, item):
         return self.feature_data[item], self.label_data[item]
@@ -41,11 +44,24 @@ class SpikeData(torch.utils.data.Dataset):
 
 
 def get_spike_loaders(data_dir, batch_size, shuffle=True):
-    dataset = SpikeData('Mouse12-120810')
-    train_loader = DataLoader(dataset=dataset, batch_size=batch_size, shuffle=shuffle)
-    test_loader = DataLoader(dataset=dataset, batch_size=batch_size, shuffle=False)
+    data_session = 'Mouse12-120810'
+    dataset = SpikeData(session=data_session)
+    test_split = .2
+    random_seed = 42
+    dataset_size = len(dataset)
+    indices = list(range(dataset_size))
+    split = int(np.floor(test_split * dataset_size))
+
+    if shuffle:
+        np.random.seed(random_seed)
+        np.random.shuffle(indices)
+    train_indices, test_indices = indices[split:], indices[:split]
+    train_sampler = SubsetRandomSampler(train_indices)
+    test_sampler = SubsetRandomSampler(test_indices)
+
+    train_loader = DataLoader(dataset=SpikeData(session=data_session), sampler=train_sampler, batch_size=batch_size)
+    test_loader = DataLoader(dataset=SpikeData(session=data_session), sampler=test_sampler, batch_size=batch_size)
     dim = dataset.dim
-    print(dim)
 
     return train_loader, test_loader, dim
 
