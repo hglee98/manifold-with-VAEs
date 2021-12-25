@@ -86,6 +86,7 @@ class Experiment:
             )
 
             # encoder/decoder mean optimization
+            # for epoch in range(1):
             for epoch in range(1, self.mu_epochs + 1):
                 loss, _, _ = train_rvae(epoch, self.train_loader, self.batch_size, self.model, 
                                         warmup_optimizer, self.log_invl, self.device)
@@ -94,13 +95,13 @@ class Experiment:
             # warmup checkpoint            
             savepath = os.path.join(self.rvae_save_dir, self.dataset+"_warmup")
             save_model(self.model, sigma_optimizer, 0, None, savepath)
-
             self.model.switch = False
+            print(1)
             self.model._update_latent_codes(self.train_loader)
             self.model._update_RBF_centers(beta=0.01)
+            print(2)
             self.model._mean_warmup = False
             self.model._initialize_prior_means()
-            
             # decoder sigma/prior parameters optimization
             for epoch in range(1, self.sigma_epochs + 1):
                 loss, _, _ = train_rvae(epoch, self.train_loader, self.batch_size, self.model, 

@@ -84,8 +84,9 @@ class RVAE(nn.Module):
     
     def _update_RBF_centers(self, beta=None):
         device = "cuda" if torch.cuda.is_available() else "cpu"
-        kmeans = KMeans(n_clusters=self.num_centers)
-        kmeans.fit(self._latent_codes.detach().cpu().numpy())
+        kmeans = KMeans(n_clusters = self.num_centers)  # self.num_centers
+        data = self._latent_codes.detach().cpu().numpy()
+        kmeans.fit(data)
         self.p_sigma._modules['0'].points.data = torch.from_numpy(kmeans.cluster_centers_.astype(np.float32)).to(device)
         self.p_sigma._modules['0'].beta = beta
 

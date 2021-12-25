@@ -26,10 +26,8 @@ class SpikeData(torch.utils.data.Dataset):
                                      anat_region='ADn')
         counts, tmp_angles = session_rates.get_spike_matrix(
             state)
-        print(counts.shape)
         tmp_angles = np.array(tmp_angles)
         self.feature_data = torch.from_numpy(counts).float()
-        print(self.feature_data.shape)
         self.label_data = torch.from_numpy(tmp_angles).float()
         self.label_data = torch.reshape(self.label_data, (-1, 1))
         self.n_samples = counts.shape[0]

@@ -15,7 +15,7 @@ def train_rvae(epoch, train_loader, batch_size, model, optimizer, log_invl, devi
     for i, (data, labels) in enumerate(train_loader):
         beta = 1
         optimizer.zero_grad()
-        data = data.view(-1, data.shape[-1] * data.shape[-2]).to(device)
+        # data = data.view(-1, data.shape[-1] * data.shape[-2]).to(device)
 
         p_mu, p_sigma, z, q_mu, q_t = model(data)
         model.dummy_pmu.load_state_dict(model.p_mu.state_dict())
