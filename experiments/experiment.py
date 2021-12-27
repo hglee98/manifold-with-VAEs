@@ -98,7 +98,6 @@ class Experiment:
             self.model.switch = False
             self.model._update_latent_codes(self.train_loader)
             self.model._update_RBF_centers(beta=0.01)
-            print(2)
             self.model._mean_warmup = False
             self.model._initialize_prior_means()
             # decoder sigma/prior parameters optimization
@@ -162,9 +161,9 @@ class Experiment:
         if pretrained_path is not None:
             placeholder_optimizer = torch.optim.Adam(
                 self.model.p_sigma.parameters(),
-                lr=1e-3
+                lr=1e-5
             )
-            load_model(pretrained_path, self.model, placeholder_optimizer)
+            load_model(pretrained_path, self.model, placeholder_optimizer, self.device)
 
         if isinstance(self.model, RVAE):
             loss, log_cond, KL = test_rvae(self.test_loader, self.batch_size, self.model, self.device)

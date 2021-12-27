@@ -11,8 +11,8 @@ def save_model(model, optimizer, epoch, loss, save_path):
     }, save_path)
 
 
-def load_model(load_path, model, optimizer):
-    checkpoint = torch.load(load_path, map_location='cpu')
+def load_model(load_path, model, optimizer, device):
+    checkpoint = torch.load(load_path)
     model.load_state_dict(checkpoint['model_state_dict'])
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     epoch = checkpoint['epoch']
