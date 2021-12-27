@@ -96,7 +96,6 @@ class Experiment:
             savepath = os.path.join(self.rvae_save_dir, self.dataset+"_warmup")
             save_model(self.model, sigma_optimizer, 0, None, savepath)
             self.model.switch = False
-            print(1)
             self.model._update_latent_codes(self.train_loader)
             self.model._update_RBF_centers(beta=0.01)
             print(2)

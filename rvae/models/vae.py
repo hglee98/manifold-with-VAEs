@@ -70,7 +70,7 @@ class RVAE(nn.Module):
         return z, q_mu, q_t
 
     def _update_latent_codes(self, data_loader):
-        device = "cuda" if torch.cuda.is_available() else "cpu"
+        device = "cuda:0" if torch.cuda.is_available() else "cpu"
         codes = []
         for _, (data, labels) in enumerate(data_loader):
             if data.dim() == 4:
@@ -83,7 +83,7 @@ class RVAE(nn.Module):
         self._latent_codes = torch.cat(codes, dim=0).view(-1, self.latent_dim)
     
     def _update_RBF_centers(self, beta=None):
-        device = "cuda" if torch.cuda.is_available() else "cpu"
+        device = "cuda:0" if torch.cuda.is_available() else "cpu"
         kmeans = KMeans(n_clusters = self.num_centers)  # self.num_centers
         data = self._latent_codes.detach().cpu().numpy()
         kmeans.fit(data)
@@ -95,7 +95,7 @@ class RVAE(nn.Module):
             idx = np.random.randint(self.num_centers)
             self.pr_means = torch.nn.Parameter(self.p_sigma._modules['0'].points.data[idx])
         else:
-            device = "cuda" if torch.cuda.is_available() else "cpu"
+            device = "cuda:0" if torch.cuda.is_available() else "cpu"
             kmeans = KMeans(n_clusters=1)
             kmeans.fit(self._latent_codes.detach().cpu().numpy())
             self.pr_means.data = torch.from_numpy(kmeans.cluster_centers_.astype(np.float32)).to(device)
@@ -228,7 +228,7 @@ class VAE(nn.Module):
         self._latent_codes = None
 
         # if num_components > 1 assume VampPrior
-        device = "cuda" if torch.cuda.is_available() else "cpu"
+        device = "cuda:0" if torch.cuda.is_available() else "cpu"
         if num_components > 1:
             self.means = NonLinear(num_components, in_dim, activation=nn.Hardtanh(min_val=0., max_val=1.))
             # self.means.linear.weight.normal_(mean=0., std=0.01)
@@ -247,7 +247,7 @@ class VAE(nn.Module):
         return mu + eps * var.sqrt()
 
     def _update_latent_codes(self, data_loader):
-        device = "cuda" if torch.cuda.is_available() else "cpu"
+        device = "cuda:0" if torch.cuda.is_available() else "cpu"
         codes = []
         for _, (data, labels) in enumerate(data_loader):
             dim1, dim2 = data.shape[-2], data.shape[-1]
@@ -257,7 +257,7 @@ class VAE(nn.Module):
         self._latent_codes = torch.cat(codes, dim=0).view(-1, self.latent_dim)
 
     def _update_RBF_centers(self, beta=None):
-        device = "cuda" if torch.cuda.is_available() else "cpu"
+        device = "cuda:0" if torch.cuda.is_available() else "cpu"
         kmeans = KMeans(n_clusters=self.num_centers)
         kmeans.fit(self._latent_codes.detach().cpu().numpy())
         self.p_sigma._modules['0'].points.data = torch.from_numpy(kmeans.cluster_centers_.astype(np.float32)).to(device)

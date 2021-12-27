@@ -14,4 +14,4 @@ if [ $MODEL = "RVAE" ]; then
     $N_COMP = 1
 fi
 
-python3 run.py --model $MODEL --dataset $DATASET --enc_layers 300 300 --dec_layers 300 300 --latent_dim $L_DIM --num_centers 5 --num_components $N_COMP --device cpu
+python3 run.py --model $MODEL --dataset $DATASET --enc_layers 32 64 --dec_layers 64 32 --latent_dim $L_DIM --num_centers 12 --num_components $N_COMP
