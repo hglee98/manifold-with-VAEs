@@ -12,10 +12,11 @@ def save_model(model, optimizer, epoch, loss, save_path):
 
 
 def load_model(load_path, model, optimizer, device):
-    checkpoint = torch.load(load_path)
-    model.load_state_dict(checkpoint['model_state_dict'])
+    checkpoint = torch.load(load_path, map_location=device)
+    checkpoint['model_state_dict']['pr_means'] = checkpoint['model_state_dict']['pr_means'][0]
+    model.load_state_dict(checkpoint['model_state_dict'], strict=False)
+    model.to(device)
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     epoch = checkpoint['epoch']
     loss = checkpoint['loss']
-
     return model, optimizer, epoch, loss

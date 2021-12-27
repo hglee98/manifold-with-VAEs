@@ -3,6 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from rvae.misc import connecting_geodesic, linear_interpolation
 from torchvision.utils import save_image
+from torchvision.transforms import transforms
 
 
 def plot_variance(model, var_dim, samples, savepath, device, log_scale=True):
@@ -57,14 +58,15 @@ def plot_variance(model, var_dim, samples, savepath, device, log_scale=True):
     plt.close()
 
 
-def plot_latent_space(model, data_loader, save_dir, device, log_scale=True):
+def plot_latent_space(model, pretrained_path, inp_dim, target_dim, data_loader, save_dir, device, log_scale=False):
     # set up the grid
-    side = 130
-    step = 1
+    side = 1
+    step = 0.1
     x = np.arange(-side, side, step)
     y = np.arange(-side, side, step)
-    xx, yy = np.meshgrid(x, y)
-    coords = np.stack((xx.flatten(), yy.flatten()))
+    z = np.arange(-side, side, step)
+    xx, yy, zz = np.meshgrid(x, y, z)
+    coords = np.stack((xx.flatten(), yy.flatten(), zz.flatten()))
     coords = coords.transpose().astype(np.float32)
     coords = torch.from_numpy(coords).to(device)
 
@@ -82,29 +84,39 @@ def plot_latent_space(model, data_loader, save_dir, device, log_scale=True):
 
     # plot background
     num_grid = xx.shape[0]
-    measure = measure.reshape(num_grid, num_grid)
-    plt.imshow(measure,
+    measure = measure.reshape(num_grid, num_grid, num_grid)
+    """plt.imshow(measure,
                interpolation='gaussian',
                origin='lower',
                extent=(-side, side,
                        -side, side),
                cmap=plt.cm.RdGy,
                aspect='auto')
-    plt.colorbar()
+    plt.colorbar()"""
 
     samples = []
     labels = []
     for _, data in enumerate(data_loader):
         x, y = data[0], data[1]
-        _, _, z, _, _ = model(x.view(-1, 784).to(device))
+        _, _, z, _, _ = model(x.view(-1, inp_dim).to(device))
         samples.append(z)
         labels.append(y)
-    
-    samples = torch.stack(samples, dim=0).view(-1, 2).detach().cpu().numpy()
-    labels = torch.stack(labels).view(-1).detach().cpu().numpy()
-    plt.scatter(samples[:, 0], samples[:, 1], s=0.7, c=labels)
-    plt.savefig(save_dir)
-    plt.close()
+
+    del samples[-1]  # for deleting data which is not a size of batch_size
+    del labels[-1]
+    fig = plt.figure(figsize=(8, 8))
+    if target_dim == 2:
+        ax = fig.add_subplot(111)
+        samples = torch.stack(samples, dim=0).view(-1, 2).detach().cpu().numpy()
+        labels = torch.stack(labels).view(-1).detach().cpu().numpy()
+        ax.scatter(samples[:, 0], samples[:, 1], s=0.7, c=labels)
+    elif target_dim == 3:
+        ax = fig.add_subplot(111, projection='3d')
+        samples = torch.stack(samples, dim=0).view(-1, 3).detach().cpu().numpy()
+        labels = torch.stack(labels).view(-1).detach().cpu().numpy()
+        ax.scatter(samples[:, 0], samples[:, 1], s=0.5, c=labels)
+    plt.show()
+   # plt.savefig(save_dir)
 
 
 def plot_brownian_motion(model, bm_samples, save_dir, device, log_scale):

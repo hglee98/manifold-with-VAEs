@@ -52,6 +52,7 @@ def test_rvae(test_loader, batch_size, model, device):
     with torch.no_grad():
         for _, (data, labels) in enumerate(test_loader):
             # data = data.view(-1, data.shape[-1] * data.shape[-2]).to(device)
+            data = data.to(device)
             p_mu, p_sigma, z, q_mu, q_t = model(data)
             loss = elbo_rvae(data, p_mu, p_sigma, z, q_mu, q_t, model, 1.)
             test_loss += loss[0]    # ELBO

@@ -16,6 +16,7 @@ def run_dim_red(inp_data, params, inp_dim, method='iso', stabilize=True):
         data_to_use = np.sqrt(inp_data)
     else:
         data_to_use = inp_data.copy()
+
     if method == 'iso':
         iso_instance = manifold.Isomap(n_neighbors=params['n_neighbors'],
                                        n_components=params['target_dim'])
