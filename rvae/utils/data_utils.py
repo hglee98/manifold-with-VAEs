@@ -13,12 +13,11 @@ from binned_spikes_class import spike_counts
 import general_file_fns as gff
 
 gen_params = gff.load_pickle_file('../general_params/general_params.p')
-session = 'Mouse12-120810'
 state = 'Wake'
 
 
 class SpikeData(torch.utils.data.Dataset):
-    def __init__(self, session):
+    def __init__(self, session, stabilize=True):
         dt_kernel = 0.1  # 이 값에 따라서 sample 을 많이 추출할 수 있고, 적게 추출할 수 있다.(sub_sampling parameter)
         sigma = 0.1  # Kernel width => 100ms
         rate_params = {'dt': dt_kernel, 'sigma': sigma}
@@ -27,6 +26,10 @@ class SpikeData(torch.utils.data.Dataset):
         counts, tmp_angles = session_rates.get_spike_matrix(
             state)
         tmp_angles = np.array(tmp_angles)
+        if stabilize:
+            counts = np.sqrt(counts)
+        else:
+            counts = counts.copy()
         self.feature_data = torch.from_numpy(counts).float()
         self.label_data = torch.from_numpy(tmp_angles).float()
         self.label_data = torch.reshape(self.label_data, (-1, 1))
