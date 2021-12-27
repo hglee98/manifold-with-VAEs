@@ -9,6 +9,7 @@ from rvae.variational_inference.train import train_rvae, test_rvae, train_vae, t
 from rvae.utils.data_utils import get_mnist_loaders, get_fmnist_loaders, get_kmnist_loaders, get_spike_loaders
 from rvae.models.vae import RVAE, VAE
 from rvae.utils.save_utils import save_model, load_model
+from rvae.vizualization.visualization import plot_latent_space
 
 
 class Experiment:
@@ -19,16 +20,16 @@ class Experiment:
             os.makedirs(args.data_dir)
         if self.dataset == "mnist":
             self.train_loader, self.test_loader = get_mnist_loaders(args.data_dir, args.batch_size)
-            in_dim = 784
+            self.in_dim = 784
         elif self.dataset == "fmnist":
             self.train_loader, self.test_loader = get_fmnist_loaders(args.data_dir, args.batch_size)
-            in_dim = 784
+            self.in_dim = 784
         elif self.dataset == "kmnist":
             self.train_loader, self.test_loader = get_kmnist_loaders(args.data_dir, args.batch_size)
-            in_dim = 784
+            self.in_dim = 784
         elif self.dataset == "spike":
             self.train_loader, self.test_loader, dim = get_spike_loaders(args.data_dir, args.batch_size)
-            in_dim = int(dim)
+            self.in_dim = int(dim)
 
         self.rvae_save_dir = os.path.join(args.save_dir, "RVAE/")
         self.vae_save_dir = os.path.join(args.save_dir, "VAE/")
@@ -50,10 +51,10 @@ class Experiment:
             np.random.seed(args.seed)
 
         if args.model.lower() == "rvae":
-            self.model = RVAE(in_dim, args.latent_dim, args.num_centers, args.enc_layers, 
+            self.model = RVAE(self.in_dim, args.latent_dim, args.num_centers, args.enc_layers,
                               args.dec_layers, nnj.Softplus, nnj.Sigmoid, args.rbf_beta, args.rec_b)
         elif args.model.lower() == "vae":
-            self.model = VAE(in_dim, args.latent_dim, args.num_centers, args.num_components,
+            self.model = VAE(self.in_dim, args.latent_dim, args.num_centers, args.num_components,
                              args.enc_layers, args.dec_layers, nnj.Softplus, nnj.Sigmoid,
                              args.rbf_beta, args.rec_b)
         
@@ -86,7 +87,6 @@ class Experiment:
             )
 
             # encoder/decoder mean optimization
-            # for epoch in range(1):
             for epoch in range(1, self.mu_epochs + 1):
                 loss, _, _ = train_rvae(epoch, self.train_loader, self.batch_size, self.model, 
                                         warmup_optimizer, self.log_invl, self.device)
@@ -98,7 +98,7 @@ class Experiment:
             self.model.switch = False
             self.model._update_latent_codes(self.train_loader)
             self.model._update_RBF_centers(beta=0.01)
-            self.model._mean_warmup = False
+            self.model._mean_warmup = True
             self.model._initialize_prior_means()
             # decoder sigma/prior parameters optimization
             for epoch in range(1, self.sigma_epochs + 1):
@@ -160,7 +160,9 @@ class Experiment:
         # load checkpoint
         if pretrained_path is not None:
             placeholder_optimizer = torch.optim.Adam(
-                self.model.p_sigma.parameters(),
+                chain(
+                    self.model.p_sigma.parameters(),
+                    [self.model.pr_means, self.model.pr_t]),
                 lr=1e-5
             )
             load_model(pretrained_path, self.model, placeholder_optimizer, self.device)
@@ -169,5 +171,17 @@ class Experiment:
             loss, log_cond, KL = test_rvae(self.test_loader, self.batch_size, self.model, self.device)
         else:
             loss, log_cond, KL = test_vae(self.test_loader, self.batch_size, self.model, self.device)
-        
-        print("Test set negative ELBO: {:.3f}, negative conditional: {:.3f}, KL: {:.3f}".format(loss, log_cond, KL))
+        print("Test set negative ELBO: {:.3f}, negative conditional: {:.3f}, KL: {:.3f}".format(loss, log_cond.item(), KL.item()))
+
+    def visualize(self, pretrained_path, save_dir, target_dim):
+        if pretrained_path is not None:
+            placeholder_optimizer = torch.optim.Adam(
+                chain(
+                    self.model.p_sigma.parameters(),
+                    [self.model.pr_means, self.model.pr_t]),
+                lr=1e-5
+            )
+            load_model(pretrained_path, self.model, placeholder_optimizer, self.device)
+
+        if isinstance(self.model, RVAE):
+            plot_latent_space(self.model, pretrained_path, self.in_dim, target_dim, self.train_loader, save_dir, self.device)

@@ -10,8 +10,4 @@ do
     esac
 done
 
-if [ $MODEL = "RVAE" ]; then
-    $N_COMP = 1
-fi
-
-python run.py --model $MODEL --dataset $DATASET --enc_layers 64 128 --dec_layers 128 64 --latent_dim $L_DIM --num_centers 32 --num_components $N_COMP
+python3 run.py --model $MODEL --dataset $DATASET --enc_layers 64 128 --dec_layers 128 64 --latent_dim $L_DIM --num_centers 32 --num_components $N_COMP
