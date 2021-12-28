@@ -77,7 +77,8 @@ class RVAE(nn.Module):
                 data = data.view(-1, data.shape[-1] * data.shape[-2]).to(device)
             elif data.dim() == 2:
                 data = data.view(-1, data.shape[-1]).to(device)
-
+            else:
+                data = data.to(device)
             z, _, _ = self.encode(data)
             codes.append(z)
         self._latent_codes = torch.cat(codes, dim=0).view(-1, self.latent_dim)
@@ -250,8 +251,8 @@ class VAE(nn.Module):
         device = "cuda:0" if torch.cuda.is_available() else "cpu"
         codes = []
         for _, (data, labels) in enumerate(data_loader):
-            dim1, dim2 = data.shape[-2], data.shape[-1]
-            q_mu, q_var = self.encode(data.view(-1, dim1 * dim2).to(device))
+            data = data.to(device)
+            q_mu, q_var = self.encode(data)
             z = self.reparameterize(q_mu, q_var)
             codes.append(z)
         self._latent_codes = torch.cat(codes, dim=0).view(-1, self.latent_dim)

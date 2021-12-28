@@ -74,10 +74,11 @@ def train_vae(epoch, annealing_epochs, train_loader, batch_size, model, optimize
     n_batches = len(train_loader.dataset)//batch_size
 
     for i, (data, labels) in enumerate(train_loader):
+        # data = data.view(-1, data.shape[-1] * data.shape[-2]).to(device)
+        data = data.to(device)
         beta = min(epoch/annealing_epochs, 1)
         optimizer.zero_grad()
-        data = data.view(-1, data.shape[-1] * data.shape[-2]).to(device)
-        
+
         p_mu, p_var, z, q_mu, q_var, pr_mu, pr_var = model(data)
         
         if model.switch:
@@ -112,8 +113,8 @@ def test_vae(test_loader, b_sz, model, device):
 
     with torch.no_grad():
         for _, (data, labels) in enumerate(test_loader):
-            data = data.view(-1, data.shape[-1] * data.shape[-2]).to(device)
-
+            # data = data.view(-1, data.shape[-1] * data.shape[-2]).to(device)
+            data = data.to(device)
             p_mu, p_var, z, q_mu, q_var, pr_mu, pr_var = model(data)
             vampprior = True if model.num_components > 1 else False
             loss = elbo_vae(data, p_mu, p_var, z, q_mu, q_var, pr_mu, pr_var, 1, vampprior)

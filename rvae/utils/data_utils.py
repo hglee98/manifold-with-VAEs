@@ -45,7 +45,7 @@ class SpikeData(torch.utils.data.Dataset):
 
 
 def get_spike_loaders(data_dir, batch_size, shuffle=True):
-    data_session = 'Mouse12-120810'
+    data_session = 'Mouse28-140313'
     dataset = SpikeData(session=data_session)
     test_split = .2
     random_seed = 42

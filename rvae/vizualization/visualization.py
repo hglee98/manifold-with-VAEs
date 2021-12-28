@@ -2,6 +2,7 @@ import torch
 import numpy as np
 from matplotlib import pyplot as plt
 from rvae.misc import connecting_geodesic, linear_interpolation
+from rvae.models.vae import RVAE, VAE
 from torchvision.utils import save_image
 from torchvision.transforms import transforms
 
@@ -72,6 +73,7 @@ def plot_latent_space(model, pretrained_path, inp_dim, target_dim, data_loader, 
 
     # evaluate metric on points on the grid
     model.eval()
+    """
     G = model.metric(coords)
     det = G.det().abs()
     
@@ -85,20 +87,25 @@ def plot_latent_space(model, pretrained_path, inp_dim, target_dim, data_loader, 
     # plot background
     num_grid = xx.shape[0]
     measure = measure.reshape(num_grid, num_grid, num_grid)
-    """plt.imshow(measure,
+    plt.imshow(measure,
                interpolation='gaussian',
                origin='lower',
                extent=(-side, side,
                        -side, side),
                cmap=plt.cm.RdGy,
                aspect='auto')
-    plt.colorbar()"""
+    plt.colorbar()
+    """
 
     samples = []
     labels = []
     for _, data in enumerate(data_loader):
         x, y = data[0], data[1]
-        _, _, z, _, _ = model(x.view(-1, inp_dim).to(device))
+        # print(model(x.view(-1, inp_dim).to(device)))
+        if isinstance(model, RVAE):
+            _, _, z, _, _ = model(x.view(-1, inp_dim).to(device))
+        else:
+            _, _, z, _, _, _, _ = model(x.view(-1, inp_dim).to(device))
         samples.append(z)
         labels.append(y)
 
@@ -114,7 +121,7 @@ def plot_latent_space(model, pretrained_path, inp_dim, target_dim, data_loader, 
         ax = fig.add_subplot(111, projection='3d')
         samples = torch.stack(samples, dim=0).view(-1, 3).detach().cpu().numpy()
         labels = torch.stack(labels).view(-1).detach().cpu().numpy()
-        ax.scatter(samples[:, 0], samples[:, 1], s=0.5, c=labels)
+        ax.scatter(samples[:, 0], samples[:, 1], samples[:, 2], s=0.5, c=labels)
     plt.show()
    # plt.savefig(save_dir)
 
