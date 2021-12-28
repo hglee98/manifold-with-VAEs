@@ -25,8 +25,8 @@ parser.add_argument("--num_centers", default=64, type=int, help="number of cente
 parser.add_argument("--rbf_beta", default=0.01, type=float, help="rbf layer beta parameter")
 parser.add_argument("--rec_b", default=1e-9, type=float)
 parser.add_argument("--num_components", default=128, type=int, help="number of components for the prior")
-parser.add_argument("--ckpt_path", default=None, type=str)
-# parser.add_argument("--ckpt_path", default="../saved_models/RVAE/spike_epoch20ckpt", type=str)
+# parser.add_argument("--ckpt_path", default=None, type=str)
+parser.add_argument("--ckpt_path", default="../saved_models/RVAE/spike_epoch40_Mouse28-140313.ckpt", type=str)
 args = parser.parse_args()
 
 experiment = Experiment(args)
@@ -35,4 +35,5 @@ if args.ckpt_path is None:
     experiment.train()
     experiment.eval()
 else:
+    experiment.eval(args.ckpt_path)
     experiment.visualize(args.ckpt_path, args.res_dir, 3)

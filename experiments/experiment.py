@@ -139,7 +139,7 @@ class Experiment:
                 print("\tEpoch: {} (warmup phase), negative ELBO: {:.3f}".format(epoch, loss))
 
             # warmup checkpoint            
-            savepath = os.path.join(self.rvae_save_dir, self.dataset+"_warmup")
+            savepath = os.path.join(self.vae_save_dir, self.dataset+"_warmup")
             save_model(self.model, sigma_optimizer, 0, None, savepath)
 
             self.model.switch = False
@@ -159,12 +159,17 @@ class Experiment:
     def eval(self, pretrained_path=None):
         # load checkpoint
         if pretrained_path is not None:
-            placeholder_optimizer = torch.optim.Adam(
-                chain(
+            if isinstance(self.model, RVAE):
+                placeholder_optimizer = torch.optim.Adam(
+                    chain(
+                        self.model.p_sigma.parameters(),
+                        [self.model.pr_means, self.model.pr_t]),
+                    lr=1e-5
+                )
+            else:
+                placeholder_optimizer = torch.optim.Adam(
                     self.model.p_sigma.parameters(),
-                    [self.model.pr_means, self.model.pr_t]),
-                lr=1e-5
-            )
+                    lr=self.sigma_learning_rate)
             load_model(pretrained_path, self.model, placeholder_optimizer, self.device)
 
         if isinstance(self.model, RVAE):
@@ -175,13 +180,22 @@ class Experiment:
 
     def visualize(self, pretrained_path, save_dir, target_dim):
         if pretrained_path is not None:
-            placeholder_optimizer = torch.optim.Adam(
-                chain(
+            if isinstance(self.model, RVAE):
+                placeholder_optimizer = torch.optim.Adam(
+                    chain(
+                        self.model.p_sigma.parameters(),
+                        [self.model.pr_means, self.model.pr_t]),
+                    lr=1e-5
+                )
+            else:
+                placeholder_optimizer = torch.optim.Adam(
                     self.model.p_sigma.parameters(),
-                    [self.model.pr_means, self.model.pr_t]),
-                lr=1e-5
-            )
+                    lr=self.sigma_learning_rate)
             load_model(pretrained_path, self.model, placeholder_optimizer, self.device)
 
         if isinstance(self.model, RVAE):
-            plot_latent_space(self.model, pretrained_path, self.in_dim, target_dim, self.train_loader, save_dir, self.device)
+            plot_latent_space(self.model, pretrained_path, self.in_dim,
+                              target_dim, self.train_loader, save_dir, self.device)
+        else:
+            plot_latent_space(self.model, pretrained_path, self.in_dim,
+                              target_dim, self.train_loader, save_dir, self.device)
