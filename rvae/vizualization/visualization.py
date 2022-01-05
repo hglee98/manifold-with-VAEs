@@ -5,6 +5,7 @@ from rvae.misc import connecting_geodesic, linear_interpolation
 from rvae.models.vae import RVAE, VAE
 from torchvision.utils import save_image
 from torchvision.transforms import transforms
+import sys
 
 
 def plot_variance(model, var_dim, samples, savepath, device, log_scale=True):
@@ -59,15 +60,19 @@ def plot_variance(model, var_dim, samples, savepath, device, log_scale=True):
     plt.close()
 
 
-def plot_latent_space(model, pretrained_path, inp_dim, target_dim, data_loader, save_dir, device, log_scale=False):
+def plot_latent_space(model, pretrained_path, inp_dim, target_dim, data_loader, save_dir, device, session, log_scale=False):
     # set up the grid
     side = 1
     step = 0.1
     x = np.arange(-side, side, step)
     y = np.arange(-side, side, step)
-    z = np.arange(-side, side, step)
-    xx, yy, zz = np.meshgrid(x, y, z)
-    coords = np.stack((xx.flatten(), yy.flatten(), zz.flatten()))
+    if target_dim == 3:
+        z = np.arange(-side, side, step)
+        xx, yy, zz = np.meshgrid(x, y, z)
+        coords = np.stack((xx.flatten(), yy.flatten(), zz.flatten()))
+    else:
+        xx, yy = np.meshgrid(x, y)
+        coords = np.stack((xx.flatten(), yy.flatten()))
     coords = coords.transpose().astype(np.float32)
     coords = torch.from_numpy(coords).to(device)
 
@@ -105,7 +110,7 @@ def plot_latent_space(model, pretrained_path, inp_dim, target_dim, data_loader, 
         if isinstance(model, RVAE):
             _, _, z, _, _ = model(x.view(-1, inp_dim).to(device))
         else:
-            _, _, z, _, _, _, _ = model(x.view(-1, inp_dim).to(device))
+            _, _, _, z, _, _, _ = model(x.view(-1, inp_dim).to(device))
         samples.append(z)
         labels.append(y)
 
@@ -117,14 +122,20 @@ def plot_latent_space(model, pretrained_path, inp_dim, target_dim, data_loader, 
         samples = torch.stack(samples, dim=0).view(-1, 2).detach().cpu().numpy()
         labels = torch.stack(labels).view(-1).detach().cpu().numpy()
         ax.scatter(samples[:, 0], samples[:, 1], s=0.7, c=labels)
+        ax.set_title(session)
     elif target_dim == 3:
         ax = fig.add_subplot(111, projection='3d')
         samples = torch.stack(samples, dim=0).view(-1, 3).detach().cpu().numpy()
         labels = torch.stack(labels).view(-1).detach().cpu().numpy()
         ax.scatter(samples[:, 0], samples[:, 1], samples[:, 2], s=0.5, c=labels)
-    plt.show()
-   # plt.savefig(save_dir)
 
+    if isinstance(model, RVAE):
+        model_name = 'RVAE'
+        plt.savefig(save_dir+'%s_%s.png' % (model_name, session))
+    else:
+        model_name = 'VAE'
+        plt.savefig(save_dir+'%s_%s.png' % (model_name, session))
+    plt.show()
 
 def plot_brownian_motion(model, bm_samples, save_dir, device, log_scale):
     sq = 120

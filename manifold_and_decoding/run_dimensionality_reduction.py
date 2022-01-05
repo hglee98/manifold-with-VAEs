@@ -39,11 +39,11 @@ if command_line:
     target_dim = int(sys.argv[4])
     desired_nSamples = int(sys.argv[5])
 else:
-    session = 'Mouse12-120810'
+    session = 'Mouse25-140131'
     state = 'Wake'
     # state2 = 'REM'  # state2 is needed when the condition is 'joint'
     condition = 'solo'  # 'solo' or 'joint'
-    target_dim = 2
+    target_dim = 3
 # target dimension 은 3 또는 2
     desired_nSamples = 15000
 
@@ -67,7 +67,7 @@ if condition == 'solo':
     sel_counts = counts[:desired_nSamples]
     # 위의 과정은 dt_kernel을 통해 subsampling을 하고 num of desired samples만큼 subsampling을 하는 과정이다.
     # _______________________________________________for checking target variable for manifold learning
-    proj = run_dim_red(sel_counts, params=dim_red_params, inp_dim=sel_count.shape[1], method=method)
+    proj = run_dim_red(sel_counts, params=dim_red_params, inp_dim=sel_counts.shape[1], method=method)
     to_save = {'seed': sd, state: proj,
                'meas_angles': tmp_angles[:desired_nSamples]}
     fname = '%s_%s_kern_%dms_sigma_%dms_binsep_%s_embed_%s_%ddims_%dneighbors_%d.p' % (
@@ -114,5 +114,5 @@ if to_plot:
         plt.savefig(gen_params['figures_dir']+'%s_%s_%s.png' % (session, state, method))
     elif condition == 'joint':
         plt.savefig(gen_params['figures_dir']+'%s_%s,%s_%s.png' % (session, state, state2, method))
-
+    plt.show()
 

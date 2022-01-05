@@ -28,7 +28,7 @@ class Experiment:
             self.train_loader, self.test_loader = get_kmnist_loaders(args.data_dir, args.batch_size)
             self.in_dim = 784
         elif self.dataset == "spike":
-            self.train_loader, self.test_loader, dim = get_spike_loaders(args.data_dir, args.batch_size)
+            self.train_loader, self.test_loader, dim = get_spike_loaders(args.data_dir, args.batch_size, args.session)
             self.in_dim = int(dim)
 
         self.rvae_save_dir = os.path.join(args.save_dir, "RVAE/")
@@ -57,7 +57,8 @@ class Experiment:
             self.model = VAE(self.in_dim, args.latent_dim, args.num_centers, args.num_components,
                              args.enc_layers, args.dec_layers, nnj.Softplus, nnj.Sigmoid,
                              args.rbf_beta, args.rec_b)
-        
+
+        self.session = args.session
         self.batch_size = args.batch_size
         self.mu_epochs = args.mu_epochs
         self.sigma_epochs = args.sigma_epochs
@@ -107,7 +108,7 @@ class Experiment:
                 print("\tEpoch: {} (sigma optimization), negative ELBO: {:.3f}".format(epoch, loss))
 
             savepath = os.path.join(self.rvae_save_dir,
-                                    self.dataset+"_epoch"+str(epoch)+"ckpt")
+                                    self.dataset+"_epoch"+str(epoch)+"_"+self.session+".ckpt")
             save_model(self.model, sigma_optimizer, epoch, loss, savepath)
 
         # ================= VAE =================
@@ -151,10 +152,10 @@ class Experiment:
                                        sigma_optimizer, self.log_invl, self.device)
                 print("\tEpoch: {} (sigma optimization), negative ELBO: {:.3f}".format(epoch, loss))
 
-                if epoch % self.save_invl == 0:
-                    savepath = os.path.join(self.vae_save_dir, 
-                                            self.dataset+"_K"+str(self.model.num_components)+"epoch"+str(epoch)+".ckpt")
-                    save_model(self.model, sigma_optimizer, epoch, loss, savepath)
+            savepath = os.path.join(self.vae_save_dir,
+                                    self.dataset+"_K"+str(self.model.num_components)+"epoch"
+                                    + str(epoch)+"_"+self.session+".ckpt")
+            save_model(self.model, sigma_optimizer, epoch, loss, savepath)
                 
     def eval(self, pretrained_path=None):
         # load checkpoint
@@ -195,7 +196,7 @@ class Experiment:
 
         if isinstance(self.model, RVAE):
             plot_latent_space(self.model, pretrained_path, self.in_dim,
-                              target_dim, self.train_loader, save_dir, self.device)
+                              target_dim, self.train_loader, save_dir, self.device, self.session)
         else:
             plot_latent_space(self.model, pretrained_path, self.in_dim,
-                              target_dim, self.train_loader, save_dir, self.device)
+                              target_dim, self.train_loader, save_dir, self.device, self.session)
