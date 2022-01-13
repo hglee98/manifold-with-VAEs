@@ -110,7 +110,7 @@ def plot_latent_space(model, pretrained_path, inp_dim, target_dim, data_loader, 
         if isinstance(model, RVAE):
             _, _, z, _, _ = model(x.view(-1, inp_dim).to(device))
         else:
-            _, _, _, z, _, _, _ = model(x.view(-1, inp_dim).to(device))
+            _, _, z, _, _, _, _ = model(x.view(-1, inp_dim).to(device))
         samples.append(z)
         labels.append(y)
 
@@ -127,7 +127,9 @@ def plot_latent_space(model, pretrained_path, inp_dim, target_dim, data_loader, 
         ax = fig.add_subplot(111, projection='3d')
         samples = torch.stack(samples, dim=0).view(-1, 3).detach().cpu().numpy()
         labels = torch.stack(labels).view(-1).detach().cpu().numpy()
+        ax.set_title(session)
         ax.scatter(samples[:, 0], samples[:, 1], samples[:, 2], s=0.5, c=labels)
+
 
     if isinstance(model, RVAE):
         model_name = 'RVAE'

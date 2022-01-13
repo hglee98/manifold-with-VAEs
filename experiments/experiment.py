@@ -52,11 +52,11 @@ class Experiment:
 
         if args.model.lower() == "rvae":
             self.model = RVAE(self.in_dim, args.latent_dim, args.num_centers, args.enc_layers,
-                              args.dec_layers, nnj.Softplus, nnj.Sigmoid, args.rbf_beta, args.rec_b)
+                              args.dec_layers, nnj.Softplus, nnj.Sigmoid, args.rbf_beta, args.rec_b, args.device)
         elif args.model.lower() == "vae":
             self.model = VAE(self.in_dim, args.latent_dim, args.num_centers, args.num_components,
                              args.enc_layers, args.dec_layers, nnj.Softplus, nnj.Sigmoid,
-                             args.rbf_beta, args.rec_b)
+                             args.rbf_beta, args.rec_b, args.device)
 
         self.session = args.session
         self.batch_size = args.batch_size
@@ -99,7 +99,7 @@ class Experiment:
             self.model.switch = False
             self.model._update_latent_codes(self.train_loader)
             self.model._update_RBF_centers(beta=0.01)
-            self.model._mean_warmup = True
+            self.model._mean_warmup = False
             self.model._initialize_prior_means()
             # decoder sigma/prior parameters optimization
             for epoch in range(1, self.sigma_epochs + 1):
@@ -108,7 +108,7 @@ class Experiment:
                 print("\tEpoch: {} (sigma optimization), negative ELBO: {:.3f}".format(epoch, loss))
 
             savepath = os.path.join(self.rvae_save_dir,
-                                    self.dataset+"_epoch"+str(epoch)+"_"+self.session+".ckpt")
+                                    self.dataset+"_epoch"+str(epoch)+"_"+self.session+"_sub"+".ckpt")
             save_model(self.model, sigma_optimizer, epoch, loss, savepath)
 
         # ================= VAE =================
@@ -174,10 +174,10 @@ class Experiment:
             load_model(pretrained_path, self.model, placeholder_optimizer, self.device)
 
         if isinstance(self.model, RVAE):
-            loss, log_cond, KL = test_rvae(self.test_loader, self.batch_size, self.model, self.device)
+            loss, log_cond, kl = test_rvae(self.test_loader, self.batch_size, self.model, self.device)
         else:
-            loss, log_cond, KL = test_vae(self.test_loader, self.batch_size, self.model, self.device)
-        print("Test set negative ELBO: {:.3f}, negative conditional: {:.3f}, KL: {:.3f}".format(loss, log_cond.item(), KL.item()))
+            loss, log_cond, kl = test_vae(self.test_loader, self.batch_size, self.model, self.device)
+        print("Test set negative ELBO: {:.3f}, negative conditional: {:.3f}, KL: {:.3f}".format(loss, log_cond.item(), kl.item()))
 
     def visualize(self, pretrained_path, save_dir, target_dim):
         if pretrained_path is not None:

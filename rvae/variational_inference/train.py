@@ -23,7 +23,7 @@ def train_rvae(epoch, train_loader, batch_size, model, optimizer, log_invl, devi
         if model.switch:
             p_sigma = torch.ones(1).to(device)
         
-        loss, log_pxz, kld = elbo_rvae(data, p_mu, p_sigma, z, q_mu, q_t.squeeze(), model, beta)
+        loss, log_pxz, kld = elbo_rvae(data, p_mu, p_sigma, z, q_mu, q_t.squeeze(), model, beta, device)
         loss.backward()
         train_loss += loss.item()
         train_kld += kld
@@ -54,7 +54,7 @@ def test_rvae(test_loader, batch_size, model, device):
             # data = data.view(-1, data.shape[-1] * data.shape[-2]).to(device)
             data = data.to(device)
             p_mu, p_sigma, z, q_mu, q_t = model(data)
-            loss = elbo_rvae(data, p_mu, p_sigma, z, q_mu, q_t, model, 1.)
+            loss = elbo_rvae(data, p_mu, p_sigma, z, q_mu, q_t, model, 1, device)
             test_loss += loss[0]    # ELBO
             test_rec += loss[1]     # log conditional
             test_kld += loss[2]     # KL div

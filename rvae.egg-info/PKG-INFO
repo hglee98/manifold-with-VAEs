@@ -1,10 +1,12 @@
-Metadata-Version: 1.0
+Metadata-Version: 2.1
 Name: rvae
 Version: 0.1
 Summary: VAEs with Riemannian Brownian Motion Priors
 Home-page: https://github.com/dimkal89/RVAE
 Author: Dimitris Kalatzis
-Author-email: UNKNOWN
 License: UNKNOWN
-Description: UNKNOWN
 Platform: UNKNOWN
+License-File: LICENSE
+
+UNKNOWN
+

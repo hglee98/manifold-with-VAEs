@@ -10,7 +10,7 @@ import math
 class DistSqKL(torch.autograd.Function):
     @staticmethod
     def forward(ctx, net, p0, p1):
-        device = "cuda" if torch.cuda.is_available() else "cpu"
+        device = "cuda:3" if torch.cuda.is_available() else "cpu"
         b_sz = p0.shape[0]
         with torch.no_grad():
             with torch.enable_grad():
@@ -59,7 +59,7 @@ def connecting_geodesic(net, p0, p1, optim=torch.optim.SGD, max_iter=25, n_nodes
     """Computes the logmap of the geodesic with endpoints 
     p0, p1 \in M by minimizing the curve energy.
     """
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    device = "cuda:3" if torch.cuda.is_available() else "cpu"
     # The line below is written assuming p1 is the mean
     curve = CubicSpline(p0, p1, num_nodes=n_nodes, device=device)
     
@@ -86,7 +86,7 @@ def connecting_geodesic(net, p0, p1, optim=torch.optim.SGD, max_iter=25, n_nodes
     return curve, curve_energies.detach_()
 
 
-def log_bm_krn(x, y, t, model):
+def log_bm_krn(x, y, t, model, device):
     """Log pdf of a Brownian motion (BM) transition kernel.
     
     params:
@@ -103,8 +103,8 @@ def log_bm_krn(x, y, t, model):
     _, logdet_y = model.metric(y).slogdet()
     log_H = (logdet_x - logdet_y)/2
     l_sq = DistSqKL.apply(model, x, y)
-
-    return -d/2 * torch.log(2 * pi * t) + log_H - l_sq/(2 * t)
+    result = -d/2 * torch.log(2 * pi * t) + log_H - l_sq/(2 * t)
+    return result
 
 
 def brownian_motion_sample(num_steps, num_samples, dim, t, init_point, model):

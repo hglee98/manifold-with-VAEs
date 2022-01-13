@@ -13,7 +13,7 @@ class RVAE(nn.Module):
     """Variational Autoencoder with a Riemannian Brownian motion prior."""
     
     def __init__(self, in_dim, latent_dim, num_centers, enc_layers, 
-                 dec_layers, act, out_fn, rbf_beta, rec_b):
+                 dec_layers, act, out_fn, rbf_beta, rec_b, device):
         """Constructor specs.
         
         Params:
@@ -56,6 +56,7 @@ class RVAE(nn.Module):
         self._latent_codes = None
         self.pr_means = torch.nn.Parameter(torch.zeros(latent_dim), requires_grad=True)
         self.pr_t = torch.nn.Parameter(torch.ones(1), requires_grad=True)
+        self.device = device
 
     def encode(self, x):
         h = self.encoder(x)
@@ -70,7 +71,7 @@ class RVAE(nn.Module):
         return z, q_mu, q_t
 
     def _update_latent_codes(self, data_loader):
-        device = "cuda:0" if torch.cuda.is_available() else "cpu"
+        device = self.device
         codes = []
         for _, (data, labels) in enumerate(data_loader):
             if data.dim() == 4:
@@ -84,7 +85,7 @@ class RVAE(nn.Module):
         self._latent_codes = torch.cat(codes, dim=0).view(-1, self.latent_dim)
     
     def _update_RBF_centers(self, beta=None):
-        device = "cuda:0" if torch.cuda.is_available() else "cpu"
+        device = self.device
         kmeans = KMeans(n_clusters = self.num_centers)  # self.num_centers
         data = self._latent_codes.detach().cpu().numpy()
         kmeans.fit(data)
@@ -96,7 +97,7 @@ class RVAE(nn.Module):
             idx = np.random.randint(self.num_centers)
             self.pr_means = torch.nn.Parameter(self.p_sigma._modules['0'].points.data[idx])
         else:
-            device = "cuda:0" if torch.cuda.is_available() else "cpu"
+            device = self.device
             kmeans = KMeans(n_clusters=1)
             kmeans.fit(self._latent_codes.detach().cpu().numpy())
             self.pr_means.data = torch.from_numpy(kmeans.cluster_centers_.astype(np.float32)).to(device)
@@ -182,7 +183,7 @@ class VAE(nn.Module):
     """Variational autoencoder with an RBF network for the decoder."""
 
     def __init__(self, in_dim, latent_dim, num_centers, num_components, enc_layers, 
-                 dec_layers, act, out_fn, rbf_beta, rec_b):
+                 dec_layers, act, out_fn, rbf_beta, rec_b, device):
         """Constructor specs.
         
         Params:
@@ -227,13 +228,14 @@ class VAE(nn.Module):
             nnj.Sqrt()
         )
         self._latent_codes = None
+        self.device = device
 
         # if num_components > 1 assume VampPrior
-        device = "cuda:0" if torch.cuda.is_available() else "cpu"
         if num_components > 1:
             self.means = NonLinear(num_components, in_dim, activation=nn.Hardtanh(min_val=0., max_val=1.))
             # self.means.linear.weight.normal_(mean=0., std=0.01)
-            self.dummy_input = torch.tensor(torch.eye(num_components, num_components), requires_grad=False, device=device)
+            self.dummy_input = torch.tensor(torch.eye(num_components, num_components),
+                                            requires_grad=False, device=self.device)
 
     def encode_prior(self):
         u = self.means(self.dummy_input)
@@ -248,7 +250,7 @@ class VAE(nn.Module):
         return mu + eps * var.sqrt()
 
     def _update_latent_codes(self, data_loader):
-        device = "cuda:0" if torch.cuda.is_available() else "cpu"
+        device = self.device
         codes = []
         for _, (data, labels) in enumerate(data_loader):
             data = data.to(device)
@@ -258,7 +260,7 @@ class VAE(nn.Module):
         self._latent_codes = torch.cat(codes, dim=0).view(-1, self.latent_dim)
 
     def _update_RBF_centers(self, beta=None):
-        device = "cuda:0" if torch.cuda.is_available() else "cpu"
+        device = self.device
         kmeans = KMeans(n_clusters=self.num_centers)
         kmeans.fit(self._latent_codes.detach().cpu().numpy())
         self.p_sigma._modules['0'].points.data = torch.from_numpy(kmeans.cluster_centers_.astype(np.float32)).to(device)
