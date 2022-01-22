@@ -60,7 +60,7 @@ def plot_variance(model, var_dim, samples, savepath, device, log_scale=True):
     plt.close()
 
 
-def plot_latent_space(model, pretrained_path, inp_dim, target_dim, data_loader, save_dir, device, session, log_scale=False):
+def plot_latent_space(model, pretrained_path, inp_dim, target_dim, data_loader, save_dir, device, session, batch_size, epoch, log_scale=False):
     # set up the grid
     side = 1
     step = 0.1
@@ -133,7 +133,7 @@ def plot_latent_space(model, pretrained_path, inp_dim, target_dim, data_loader, 
 
     if isinstance(model, RVAE):
         model_name = 'RVAE'
-        plt.savefig(save_dir+'%s_%s.png' % (model_name, session))
+        plt.savefig(save_dir+'%s_%s_batch_%s_epoch_%s.png' % (model_name, session, batch_size, epoch))
     else:
         model_name = 'VAE'
         plt.savefig(save_dir+'%s_%s.png' % (model_name, session))

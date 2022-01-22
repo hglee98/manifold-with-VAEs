@@ -108,7 +108,8 @@ class Experiment:
                 print("\tEpoch: {} (sigma optimization), negative ELBO: {:.3f}".format(epoch, loss))
 
             savepath = os.path.join(self.rvae_save_dir,
-                                    self.dataset+"_epoch"+str(epoch)+"_"+self.session+"_sub"+".ckpt")
+                                    self.dataset+"_epoch"+str(epoch)+"_"+"batch_"
+                                    +str(self.batch_size)+self.session+".ckpt")
             save_model(self.model, sigma_optimizer, epoch, loss, savepath)
 
         # ================= VAE =================
@@ -196,7 +197,10 @@ class Experiment:
 
         if isinstance(self.model, RVAE):
             plot_latent_space(self.model, pretrained_path, self.in_dim,
-                              target_dim, self.train_loader, save_dir, self.device, self.session)
+                              target_dim, self.train_loader, save_dir, self.device, self.session,
+                              batch_size=self.batch_size, epoch=self.sigma_epochs)
         else:
             plot_latent_space(self.model, pretrained_path, self.in_dim,
-                              target_dim, self.train_loader, save_dir, self.device, self.session)
+                              target_dim, self.train_loader, save_dir, self.device, self.session,
+                              batch_size=self.batch_size, epoch=self.sigma_epochs)
+

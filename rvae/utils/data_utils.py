@@ -33,7 +33,7 @@ class SpikeData(torch.utils.data.Dataset):
             counts = counts.copy()
 
         # following line of code is for subsampling of neuro clusters.
-        counts = counts[:, ::2]
+        # counts = counts[:, ::2]
         self.feature_data = torch.from_numpy(counts).float()
         self.label_data = torch.from_numpy(tmp_angles).float()
         self.label_data = torch.reshape(self.label_data, (-1, 1))

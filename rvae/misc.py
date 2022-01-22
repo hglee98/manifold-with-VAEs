@@ -10,7 +10,7 @@ import math
 class DistSqKL(torch.autograd.Function):
     @staticmethod
     def forward(ctx, net, p0, p1):
-        device = "cuda:3" if torch.cuda.is_available() else "cpu"
+        device = "cuda:2" if torch.cuda.is_available() else "cpu"
         b_sz = p0.shape[0]
         with torch.no_grad():
             with torch.enable_grad():
@@ -59,7 +59,7 @@ def connecting_geodesic(net, p0, p1, optim=torch.optim.SGD, max_iter=25, n_nodes
     """Computes the logmap of the geodesic with endpoints 
     p0, p1 \in M by minimizing the curve energy.
     """
-    device = "cuda:3" if torch.cuda.is_available() else "cpu"
+    device = "cuda:2" if torch.cuda.is_available() else "cpu"
     # The line below is written assuming p1 is the mean
     curve = CubicSpline(p0, p1, num_nodes=n_nodes, device=device)
     
