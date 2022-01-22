@@ -2,6 +2,7 @@ import os
 import torch
 import numpy as np
 
+
 from itertools import chain
 
 from rvae.geoml import nnj
@@ -10,6 +11,7 @@ from rvae.utils.data_utils import get_mnist_loaders, get_fmnist_loaders, get_kmn
 from rvae.models.vae import RVAE, VAE
 from rvae.utils.save_utils import save_model, load_model
 from rvae.vizualization.visualization import plot_latent_space
+from rvae.shared_scripts.bags_of_tricks import *
 
 
 class Experiment:
@@ -87,15 +89,19 @@ class Experiment:
                 lr=self.sigma_learning_rate
             )
 
+            # learning rate scheduler
+            warmup_scheduler = torch.optim.lr_scheduler.ExponentialLR(warmup_optimizer, gamma=0.9)
+            sigma_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(sigma_optimizer, T_max=self.sigma_epochs, eta_min=1e-9)
+
             # encoder/decoder mean optimization
             for epoch in range(1, self.mu_epochs + 1):
                 loss, _, _ = train_rvae(epoch, self.train_loader, self.batch_size, self.model, 
-                                        warmup_optimizer, self.log_invl, self.device)
+                                        warmup_optimizer, warmup_scheduler, self.log_invl, self.device)
                 print("\tEpoch: {} (warmup phase), negative ELBO: {:.3f}".format(epoch, loss))
 
             # warmup checkpoint            
             savepath = os.path.join(self.rvae_save_dir, self.dataset+"_warmup")
-            save_model(self.model, sigma_optimizer, 0, None, savepath)
+            save_model(self.model, warmup_optimizer, warmup_scheduler, 0, None, savepath)
             self.model.switch = False
             self.model._update_latent_codes(self.train_loader)
             self.model._update_RBF_centers(beta=0.01)
@@ -104,13 +110,13 @@ class Experiment:
             # decoder sigma/prior parameters optimization
             for epoch in range(1, self.sigma_epochs + 1):
                 loss, _, _ = train_rvae(epoch, self.train_loader, self.batch_size, self.model, 
-                                        sigma_optimizer, self.log_invl, self.device)
+                                        sigma_optimizer, sigma_scheduler, self.log_invl, self.device)
                 print("\tEpoch: {} (sigma optimization), negative ELBO: {:.3f}".format(epoch, loss))
 
             savepath = os.path.join(self.rvae_save_dir,
                                     self.dataset+"_epoch"+str(epoch)+"_"+"batch_"
                                     +str(self.batch_size)+self.session+".ckpt")
-            save_model(self.model, sigma_optimizer, epoch, loss, savepath)
+            save_model(self.model, sigma_optimizer, sigma_scheduler, epoch, loss, savepath)
 
         # ================= VAE =================
         else:

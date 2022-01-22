@@ -10,4 +10,4 @@ do
     esac
 done
 
-python3 run.py --model $MODEL --dataset $DATASET --enc_layers 64 128 --dec_layers 128 64 --latent_dim $L_DIM --num_centers 64 --num_components $N_COMP
+python3 run.py --model $MODEL --dataset $DATASET --enc_layers 64 128 --dec_layers 128 64 --latent_dim $L_DIM --num_centers 128 --num_components $N_COMP
