@@ -4,6 +4,6 @@ torchvision~=0.11.2
 scikit-learn~=1.5.0
 matplotlib~=3.4.3
 rvae~=0.1
-setuptools~=65.5.1
+setuptools~=70.0.0
 pandas~=1.3.4
 scipy~=1.10.0
